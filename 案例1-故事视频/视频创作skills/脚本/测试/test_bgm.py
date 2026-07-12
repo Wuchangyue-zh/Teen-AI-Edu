@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-from 脚本.story_video.video import _resolve_bgm_path, _detect_bgm_from_story
+from 脚本.story_video.video import _resolve_bgm_path, _detect_bgm_from_story, _is_bgm_disabled
 
 class BGMTests(unittest.TestCase):
     def setUp(self):
@@ -16,8 +16,8 @@ class BGMTests(unittest.TestCase):
                     "温暖": "卡农.mp3",
                     "温柔": "卡农.mp3",
                     "温馨": "卡农.mp3",
-                    "勇敢": "If - Death Pledge_HQ.mp3",
-                    "冒险": "If - Death Pledge_HQ.mp3",
+                    "勇敢": "勇气之誓.mp3",
+                    "冒险": "勇气之誓.mp3",
                     "空灵": "空灵之声.mp3",
                     "安静": "卡农.mp3",
                     "静谧": "卡农.mp3",
@@ -63,7 +63,7 @@ class BGMTests(unittest.TestCase):
         }
         path = _detect_bgm_from_story(story, self.config)
         self.assertIsNotNone(path)
-        self.assertEqual(path.name, "If - Death Pledge_HQ.mp3")
+        self.assertEqual(path.name, "勇气之誓.mp3")
 
     def test_detect_bgm_fallback(self):
         story = {
@@ -74,6 +74,11 @@ class BGMTests(unittest.TestCase):
         self.assertIsNotNone(path)
         # Should fallback to one of the fallback keys (e.g. 卡农.mp3)
         self.assertEqual(path.name, "卡农.mp3")
+
+    def test_explicit_no_music_is_recognized(self):
+        self.assertTrue(_is_bgm_disabled("无"))
+        self.assertTrue(_is_bgm_disabled("关闭"))
+        self.assertFalse(_is_bgm_disabled("自动匹配"))
 
 if __name__ == "__main__":
     unittest.main()

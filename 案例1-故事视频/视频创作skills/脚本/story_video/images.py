@@ -212,57 +212,174 @@ def _add_name_to_image(image_path: Path, name: str) -> None:
 
 
 def _generate_ending_slide(title: str, creator: str, output_path: Path, config: dict[str, Any]) -> None:
+    """生成留白充足、以标题和创作者署名为主的结尾作品页。"""
     from PIL import Image, ImageDraw
-    
+
     image_config = config["image"]
     width = int(image_config["width"])
     height = int(image_config["height"])
-    
-    img = Image.new("RGB", (width, height), color=(15, 23, 42))
+    img = Image.new("RGB", (width, height), color=(16, 29, 60))
     draw = ImageDraw.Draw(img)
-    
-    # 绘制深灰蓝到深灰色的优雅渐变背景
+
     for y in range(height):
         ratio = y / height
-        r = int(15 * (1 - ratio) + 2 * ratio)
-        g = int(23 * (1 - ratio) + 4 * ratio)
-        b = int(42 * (1 - ratio) + 8 * ratio)
-        draw.line([(0, y), (width, y)], fill=(r, g, b))
-        
-    font_title_size = max(36, int(width * 0.055))
-    font_creator_size = max(24, int(width * 0.040))
-    
-    font_title = _get_font(font_title_size)
-    font_creator = _get_font(font_creator_size)
-    
+        draw.line([(0, y), (width, y)], fill=(int(16 + 30 * ratio), int(29 + 9 * ratio), int(60 + 38 * ratio)))
+
+    # 只在边缘布置少量星光，中央留白交给标题和署名。
+    sparkles = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    sparkle_draw = ImageDraw.Draw(sparkles)
+    for index in range(20):
+        x = (index * 437 + 113) % width
+        y = ((index * 251 + 73) % int(height * 0.30)) if index < 10 else int(height * 0.76) + ((index * 137) % int(height * 0.17))
+        radius = 2 + (index % 3) * 2
+        color = (255, 230, 163, 90 + (index % 3) * 40)
+        sparkle_draw.ellipse([x - radius, y - radius, x + radius, y + radius], fill=color)
+        if index % 6 == 0:
+            sparkle_draw.line([x - radius * 3, y, x + radius * 3, y], fill=color, width=1)
+            sparkle_draw.line([x, y - radius * 3, x, y + radius * 3], fill=color, width=1)
+    img = Image.alpha_composite(img.convert("RGBA"), sparkles).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    gold = (244, 207, 128)
+    cream = (255, 247, 224)
+    # 成片主要在手机竖屏直接观看；创作者名是最大视觉信息，不能依赖用户放大阅读。
+    font_kicker = _get_font(max(34, int(width * 0.036)))
+    font_title = _get_font(max(74, int(width * 0.084)))
+    creator_font_size = max(88, int(width * 0.102))
+    font_creator = _get_font(creator_font_size)
+    font_caption = _get_font(max(34, int(width * 0.036)))
     title_text = f"《{title}》"
-    creator_text = f"{creator or '无名创作者'} 作品"
-    
-    try:
-        bbox_t = draw.textbbox((0, 0), title_text, font=font_title)
-        t_w = bbox_t[2] - bbox_t[0]
-        t_h = bbox_t[3] - bbox_t[1]
-    except AttributeError:
-        t_w, t_h = draw.textsize(title_text, font=font_title)
-        
-    try:
-        bbox_c = draw.textbbox((0, 0), creator_text, font=font_creator)
-        c_w = bbox_c[2] - bbox_c[0]
-        c_h = bbox_c[3] - bbox_c[1]
-    except AttributeError:
-        c_w, c_h = draw.textsize(creator_text, font=font_creator)
-        
-    title_x = (width - t_w) // 2
-    title_y = int(height * 0.4)
-    
-    creator_x = (width - c_w) // 2
-    creator_y = title_y + t_h + int(height * 0.1)
-    
-    draw.text((title_x, title_y), title_text, fill=(255, 255, 255), font=font_title)
-    draw.text((creator_x, creator_y), creator_text, fill=(226, 232, 240), font=font_creator)
-    
+    creator_text = creator or "无名创作者"
+
+    # 顶部的小标识建立仪式感，细线与标题形成清楚的阅读起点。
+    kicker = "STORY COMPLETE"
+    kicker_box = draw.textbbox((0, 0), kicker, font=font_kicker)
+    kicker_w = kicker_box[2] - kicker_box[0]
+    kicker_y = int(height * 0.22)
+    draw.text(((width - kicker_w) // 2, kicker_y), kicker, fill=gold, font=font_kicker)
+    line_y = kicker_y + int(height * 0.045)
+    line_w = int(width * 0.12)
+    draw.line([(width // 2 - line_w, line_y), (width // 2 + line_w, line_y)], fill=gold, width=max(2, int(width * 0.002)))
+
+    # 长标题最多折为两行，始终保留舒适的左右边距。
+    max_title_width = int(width * 0.86)
+    title_lines = [title_text]
+    title_box = draw.textbbox((0, 0), title_text, font=font_title)
+    if title_box[2] - title_box[0] > max_title_width and len(title_text) > 4:
+        midpoint = len(title_text) // 2
+        title_lines = [title_text[:midpoint], title_text[midpoint:]]
+    title_y = int(height * 0.36)
+    line_gap = int(height * 0.018)
+    for line in title_lines:
+        box = draw.textbbox((0, 0), line, font=font_title)
+        text_w, text_h = box[2] - box[0], box[3] - box[1]
+        draw.text(((width - text_w) // 2 + 2, title_y + 3), line, fill=(8, 14, 34), font=font_title)
+        draw.text(((width - text_w) // 2, title_y), line, fill=cream, font=font_title)
+        title_y += text_h + line_gap
+
+    # 署名独占一行，以大字号成为结尾页最醒目的信息。
+    author_label = "创作者"
+    label_box = draw.textbbox((0, 0), author_label, font=font_caption)
+    creator_box = draw.textbbox((0, 0), creator_text, font=font_creator)
+    while creator_box[2] - creator_box[0] > int(width * 0.82) and creator_font_size > 60:
+        creator_font_size -= 4
+        font_creator = _get_font(creator_font_size)
+        creator_box = draw.textbbox((0, 0), creator_text, font=font_creator)
+    author_y = max(int(height * 0.63), title_y + int(height * 0.08))
+    label_w = label_box[2] - label_box[0]
+    creator_w = creator_box[2] - creator_box[0]
+    draw.text(((width - label_w) // 2, author_y), author_label, fill=(218, 190, 123), font=font_caption)
+    creator_y = author_y + (label_box[3] - label_box[1]) + int(height * 0.028)
+    draw.text(((width - creator_w) // 2 + 3, creator_y + 4), creator_text, fill=(7, 13, 30), font=font_creator)
+    draw.text(((width - creator_w) // 2, creator_y), creator_text, fill=cream, font=font_creator)
+    rule_y = creator_y + (creator_box[3] - creator_box[1]) + int(height * 0.030)
+    draw.line([(int(width * 0.22), rule_y), (int(width * 0.78), rule_y)], fill=(203, 168, 94), width=max(3, int(width * 0.0025)))
+
+    closing = "感谢观看"
+    closing_box = draw.textbbox((0, 0), closing, font=font_caption)
+    draw.text(((width - (closing_box[2] - closing_box[0])) // 2, int(height * 0.86)), closing, fill=(225, 229, 239), font=font_caption)
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    img.save(output_path, "JPEG")
+    img.save(output_path, "JPEG", quality=95)
+
+
+def _character_reference_paths(paths: dict[str, Path], characters: list[dict[str, Any]]) -> list[Path]:
+    return [paths["images"] / f"角色参考_{index}.jpg" for index, _ in enumerate(characters, 1)]
+
+
+def _generate_character_references(
+    *,
+    paths: dict[str, Path],
+    characters: list[dict[str, Any]],
+    style: str,
+    normalized: Path,
+    config: dict[str, Any],
+    force: bool,
+) -> list[Path]:
+    """生成可单独审核的角色原型；场景生成阶段只复用这些已确认的文件。"""
+    character_paths: list[Path] = []
+    for idx, char in enumerate(characters, 1):
+        name = char.get("name", f"角色_{idx}")
+        subject_type = str(char.get("subject_type", "object")).strip().lower()
+        non_human_guard = ""
+        if subject_type != "person":
+            non_human_guard = (
+                f"主角类型是 {subject_type}，主角就是这个主体本身。"
+                "不要添加人类头部、身体或操作者，不要把它改造成穿着该物体的人，也不要新增人类主角。"
+                "画面中不得出现任何人类、人形角色、人脸或人手。"
+            )
+
+        char_img_path = paths["images"] / f"角色参考_{idx}.jpg"
+        if force and char_img_path.exists():
+            char_img_path.unlink()
+        if not char_img_path.exists():
+            prompt = (
+                "根据输入的原画制作一张角色原型图，供创作者先确认角色是否正确。"
+                f"角色名：{name}。"
+                f"外形：{char.get('appearance', '')}。"
+                f"特别之处：{char.get('special_ability', '')}。"
+                f"画面风格：{style}。"
+                f"{non_human_guard}"
+                "保留原画最有辨识度的轮廓、颜色、结构和朴拙手绘气质；单一角色完整入镜，"
+                "简单浅色背景，竖版3:4，无文字、无字幕、无水印。"
+            )
+            print(f"正在生成角色【{name}】的原型图……")
+            _generate_image(prompt=prompt, references=[normalized], output=char_img_path, config=config)
+            try:
+                _add_name_to_image(char_img_path, name)
+                print(f"已在角色【{name}】原型图上印写名字")
+            except Exception as err:
+                print(f"在图片上印写角色【{name}】的名字失败：{err}")
+        character_paths.append(char_img_path)
+    return character_paths
+
+
+def generate_prototypes(
+    project: Path,
+    *,
+    config: dict[str, Any],
+    force: bool = False,
+) -> list[Path]:
+    """第二阶段：只生成角色原型，让创作者确认后再生成四幕场景。"""
+    from .docx_helper import sync_docx_to_json
+    sync_docx_to_json(project)
+    paths = ensure_project_dirs(project)
+    story = load_json(paths["text"] / "故事.json")
+    original = find_single_input(paths["input"], "原始手绘")
+    normalized = _normalize_drawing(original, paths["work"] / "手绘参考.jpg")
+    characters = story.get("characters", []) or ([story["character"]] if story.get("character") else [])
+    if not characters:
+        raise RuntimeError("故事缺少角色设定，无法生成角色原型。")
+    outputs = _generate_character_references(
+        paths=paths,
+        characters=characters,
+        style=story.get("style", "温暖手绘绘本"),
+        normalized=normalized,
+        config=config,
+        force=force,
+    )
+    update_manifest(project, "prototype", outputs)
+    return outputs
 
 
 def generate_images(
@@ -283,50 +400,18 @@ def generate_images(
     if not characters and "character" in story:
         characters = [story["character"]]
 
-    style = story.get("style", "温暖童趣的手绘绘本")
-    
-    # 1. 循环生成各角色的标准参考图，并在图上印上对应的名字
-    character_paths: list[Path] = []
-    for idx, char in enumerate(characters, 1):
-        name = char.get("name", f"角色_{idx}")
-        subject_type = str(char.get("subject_type", "object")).strip().lower()
-        non_human_guard = ""
-        if subject_type != "person":
-            non_human_guard = (
-                f"主角类型是 {subject_type}，主角就是这个主体本身。"
-                "不要添加人类头部、身体或操作者，不要把它改造成穿着该物体的人，也不要新增人类主角。"
-                "画面中不得出现任何人类、儿童、人形角色、人脸或人手。"
-            )
-            
-        char_img_path = paths["images"] / f"角色参考_{idx}.jpg"
-        if force and scene is None and char_img_path.exists():
-            char_img_path.unlink()
-            
-        if not char_img_path.exists():
-            prompt = (
-                "根据输入的孩子原画制作一张角色标准参考图。"
-                f"角色名：{name}。"
-                f"外形：{char.get('appearance', '')}。"
-                f"特别之处：{char.get('special_ability', '')}。"
-                f"画面风格：{style}。"
-                f"{non_human_guard}"
-                "保留原画最有辨识度的轮廓、颜色、结构和朴拙手绘气质；单一角色完整入镜，"
-                "简单浅色背景，竖版3:4，无文字、无字幕、无水印。"
-            )
-            print(f"正在生成角色【{name}】的标准参考图……")
-            _generate_image(prompt=prompt, references=[normalized], output=char_img_path, config=config)
-            
-            try:
-                _add_name_to_image(char_img_path, name)
-                print(f"已在角色【{name}】参考图上印写名字")
-            except Exception as err:
-                print(f"在图片上印写角色【{name}】的名字失败：{err}")
-                
-        character_paths.append(char_img_path)
+    style = story.get("style", "温暖手绘绘本")
+    character_paths = _character_reference_paths(paths, characters)
+    missing_prototypes = [path.name for path in character_paths if not path.exists()]
+    if missing_prototypes:
+        raise RuntimeError(
+            "缺少已确认的角色原型：" + "、".join(missing_prototypes)
+            + "。请先运行 prototype 生成并由创作者确认角色原型。"
+        )
 
     # 2. 场景图片生成
-    selected = {scene} if scene else {1, 2, 3, 4}
-    outputs: list[Path] = list(character_paths)
+    selected = {scene} if scene else set(range(1, len(story["scenes"]) + 1))
+    outputs: list[Path] = []
     for scene_data in story["scenes"]:
         index = int(scene_data["index"])
         output = paths["images"] / f"场景_{index:02d}.jpg"
@@ -349,16 +434,16 @@ def generate_images(
             non_human_guard = (
                 f"主角类型是 {subject_type}，主角就是这个主体本身。"
                 "不要添加人类头部、身体或操作者，不要把它改造成穿着该物体的人，也不要新增人类主角。"
-                "画面中不得出现任何人类、儿童、人形角色、人脸或人手。"
+                "画面中不得出现任何人类、人形角色、人脸或人手。"
             )
             
         prompt = (
-            f"图1是孩子原画。{ref_descr}请生成包含上述角色的故事场景，"
+            f"图1是创作者提供的原画。{ref_descr}请生成包含上述角色的故事场景，"
             "严格保留各个角色的辨识度、主要颜色、结构 and 手绘气质，不要重新设计角色。"
             f"{non_human_guard}"
             f"故事场景：{scene_data['visual_prompt']}。"
             f"统一风格：{style}。"
-            "主体清楚，适合小学阶段儿童，竖版3:4构图。所有动作只用画面表现，"
+            "主体清楚，适合日常竖版故事分享，竖版3:4构图。所有动作只用画面表现，"
             "不要把提示词、动作、声音或故事内容写在图片里；无文字、无字母、无数字、无字幕、无水印。"
             f"最终硬性检查：{non_human_guard}"
         )

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from .common import (
+    ROOT,
     audio_data_uri,
     ensure_project_dirs,
     http_json,
@@ -14,6 +15,12 @@ from .common import (
     run_command,
     update_manifest,
 )
+
+
+# 官方合法预置音色（见 参考/03_技术与隐私.md）
+OFFICIAL_PRESET_VOICES = {"冰糖", "苏打", "茉莉", "白桦"}
+# 表示“使用声音克隆”的模式关键词，这些词不是合法音色名
+CLONE_KEYWORDS = {"克隆音", "克隆", "克隆声音", "声音克隆"}
 from .project import find_single_input
 
 
@@ -100,26 +107,47 @@ def generate_voice(
     sync_docx_to_json(project)
     paths = ensure_project_dirs(project)
     story = load_json(paths["text"] / "故事.json")
+
+    # 文档/命令里指定的音色设定；可能是官方音色名，也可能是“克隆音”这类模式关键词
+    voice_setting = (preset_override or story.get("voice") or "").strip()
+    clone_requested = voice_setting in CLONE_KEYWORDS
+
+    # 1) 优先使用项目 输入/ 下的个性化声音参考
     source = None
     try:
         source = find_single_input(paths["input"], "声音参考")
     except RuntimeError:
         pass
 
+    # 2) 项目未提供参考，但文档指定“克隆音”时，回退到 Skill 自带的克隆样例
+    if source is None and clone_requested:
+        bundled_ref = ROOT / "资源" / "用户声音" / "声音参考.wav"
+        if bundled_ref.exists():
+            source = bundled_ref
+            print(f"【声音生成】项目 输入/ 未提供声音参考，但文档指定“克隆音”，改用 Skill 自带样例：{bundled_ref.name}。")
+        else:
+            print("【声音生成】文档指定“克隆音”，但项目与 Skill 自带样例均无声音参考，将回退到官方预置音色。")
+
     normalized = None
     preset_voice_name = None
     if source:
         normalized = _normalize_voice(source, paths["work"] / "声音参考_24k.wav")
-        print(f"【声音生成】检测到个性化参考声音：{source.name}，启动「声音克隆」模式（模型：mimo-v2.5-tts-voiceclone）。")
+        print(f"【声音生成】检测到参考声音：{source.name}，启动「声音克隆」模式（模型：mimo-v2.5-tts-voiceclone）。")
     else:
-        preset_voice_name = (
-            preset_override 
-            or story.get("voice") 
+        # 预置音色：绝不能把“克隆音”等模式关键词当作音色名传给接口
+        candidate = (
+            preset_override
+            or story.get("voice")
             or config.get("voice", {}).get("preset_voice", "冰糖")
         )
-        print(f"【声音生成】未检测到个性化参考声音，启动「内置预置音色」模式。所选音色：{preset_voice_name}（模型：mimo-v2.5-tts）。")
+        if candidate not in OFFICIAL_PRESET_VOICES:
+            fallback = config.get("voice", {}).get("preset_voice", "冰糖")
+            print(f"【声音生成】“{candidate}”不是有效的官方预置音色，已回退默认音色：{fallback}。")
+            candidate = fallback
+        preset_voice_name = candidate
+        print(f"【声音生成】启动「内置预置音色」模式。所选音色：{preset_voice_name}（模型：mimo-v2.5-tts）。")
     
-    selected = {scene} if scene else {1, 2, 3, 4}
+    selected = {scene} if scene else set(range(1, len(story["scenes"]) + 1))
     outputs: list[Path] = []
     for scene_data in story["scenes"]:
         index = int(scene_data["index"])

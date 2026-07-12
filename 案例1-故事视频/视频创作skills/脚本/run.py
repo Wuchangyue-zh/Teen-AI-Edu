@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from story_video.common import ROOT, load_environment, load_json, require_command
-from story_video.images import generate_images
+from story_video.images import generate_images, generate_prototypes
 from story_video.project import initialize_project
 from story_video.verify import verify_project
 from story_video.video import render_video
@@ -36,7 +36,7 @@ def load_config(path: Path) -> dict:
 
 def preflight(config: dict) -> bool:
     statuses = []
-    print("儿童 AI 故事视频 - 环境检查")
+    print("原画 AI 故事视频 - 环境检查")
     print(f"Python: {sys.version.split()[0]}")
     for command in ("ffmpeg", "ffprobe"):
         found = shutil.which(command)
@@ -65,7 +65,7 @@ def add_project_argument(parser: argparse.ArgumentParser) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="从孩子原画自动生成3:4故事视频")
+    parser = argparse.ArgumentParser(description="从原画自动生成3:4故事视频")
     parser.add_argument("--config", default=str(ROOT / "config.json"), help="配置文件路径")
     parser.add_argument("--env-file", help="可选的 .env 路径")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -74,11 +74,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     init = sub.add_parser("init", help="建立一个新的故事项目")
     add_project_argument(init)
-    init.add_argument("--drawing", required=True, help="孩子原画路径")
+    init.add_argument("--drawing", help="可选；生成配图前必须提供原画路径")
     init.add_argument("--story", required=True, help="四幕故事 JSON 路径")
     init.add_argument("--voice", help="15-30秒参考声音路径；只做图片时可暂不提供")
 
-    images = sub.add_parser("images", help="生成角色标准图和四幕故事配图")
+    prototype = sub.add_parser("prototype", help="只生成角色原型，供创作者确认")
+    add_project_argument(prototype)
+    prototype.add_argument("--force", action="store_true", help="重新生成角色原型")
+
+    images = sub.add_parser("images", help="基于已确认的角色原型生成四幕故事配图")
     add_project_argument(images)
     images.add_argument("--scene", type=int, choices=range(1, 5), help="只处理指定场景")
     images.add_argument("--force", action="store_true", help="覆盖已有结果")
@@ -102,7 +106,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     all_cmd = sub.add_parser("all", help="初始化并执行全部制作步骤")
     add_project_argument(all_cmd)
-    all_cmd.add_argument("--drawing", required=True, help="孩子原画路径")
+    all_cmd.add_argument("--drawing", required=True, help="原画路径")
     all_cmd.add_argument("--story", required=True, help="四幕故事 JSON 路径")
     all_cmd.add_argument("--voice", help="15-30秒参考声音路径；使用官方内置音色时无需提供")
     all_cmd.add_argument("--preset", help="指定小米官方内置音色（如：冰糖、苏打、茉莉、白桦）")
@@ -122,7 +126,7 @@ def main() -> int:
         if args.command in {"init", "all"}:
             initialize_project(
                 project,
-                drawing=resolve_path(args.drawing),
+                drawing=resolve_path(args.drawing) if args.drawing else None,
                 story_path=resolve_path(args.story),
                 voice=resolve_path(args.voice) if args.voice else None,
                 config=config,
@@ -136,6 +140,18 @@ def main() -> int:
             docx_path = project / "故事.docx"
             generate_initial_docx(project, story_path, docx_path)
             print(f"故事文档已初始化：{docx_path}")
+        if args.command in {"prototype", "all"}:
+            generate_prototypes(
+                project,
+                config=config,
+                force=getattr(args, "force", False),
+            )
+            story_path = project / ".工作" / "故事.json"
+            docx_path = project / "故事.docx"
+            images_dir = project / "图片"
+            if story_path.exists():
+                update_docx_with_images(project, story_path, docx_path, images_dir)
+                print(f"故事文档已更新插入角色原型：{docx_path}")
         if args.command in {"images", "all"}:
             generate_images(
                 project,
@@ -184,4 +200,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

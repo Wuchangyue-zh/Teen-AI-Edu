@@ -175,9 +175,9 @@ def validate_story(story: dict[str, Any]) -> None:
             raise RuntimeError(f"第 {idx} 个角色缺少 subject_type。请标记是人物、动物、物品、植物、车辆还是建筑。")
             
     scenes = story.get("scenes")
-    if not isinstance(scenes, list) or len(scenes) != 4:
-        raise RuntimeError("MVP 故事必须正好包含四幕 scenes。")
-    expected = [1, 2, 3, 4]
+    if not isinstance(scenes, list) or len(scenes) < 1:
+        raise RuntimeError("故事至少需要包含一幕 scenes。")
+    expected = list(range(1, len(scenes) + 1))
     actual = [scene.get("index") for scene in scenes]
     if actual != expected:
         raise RuntimeError("四幕场景的 index 必须依次为 1、2、3、4。")

@@ -12,13 +12,13 @@
     "provider": "xiaomi_mimo",
     "model": "mimo-v2.5-tts-voiceclone",
     "format": "wav",
-    "instruction": "自然、清晰、温暖的中文讲故事语气，语速稍慢，适合小学生听。",
+    "instruction": "自然、清晰、温暖的中文讲故事语气，语速稍慢，适合日常分享。",
     "max_retries": 2,
     "timeout_seconds": 180,
     "preset_voice": "冰糖",
     "preset_voices": {
-      "小孩女": "冰糖",
-      "小孩男": "苏打",
+      "明亮女声": "冰糖",
+      "明亮男声": "苏打",
       "成年女": "茉莉",
       "成年男": "白桦"
     }
@@ -36,6 +36,7 @@
     "subtitle_max_chars": 16,
     "bgm_enabled": true,
     "bgm_volume": 0.12,
+    "ending_duration_seconds": 2.8,
     "bgm_mappings": {
       "开心": "菊次郎的夏天.mp3",
       "活泼": "菊次郎的夏天.mp3",
@@ -44,8 +45,8 @@
       "温暖": "卡农.mp3",
       "温柔": "卡农.mp3",
       "温馨": "卡农.mp3",
-      "勇敢": "If - Death Pledge_HQ.mp3",
-      "冒险": "If - Death Pledge_HQ.mp3",
+      "勇敢": "勇气之誓.mp3",
+      "冒险": "勇气之誓.mp3",
       "空灵": "空灵之声.mp3",
       "安静": "卡农.mp3",
       "静谧": "卡农.mp3",

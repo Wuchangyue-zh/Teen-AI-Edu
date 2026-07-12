@@ -124,6 +124,10 @@ def _detect_bgm_from_story(story: dict[str, Any], config: dict[str, Any]) -> Pat
     return None
 
 
+def _is_bgm_disabled(value: str | None) -> bool:
+    return str(value or "").strip().lower() in {"无", "关闭", "none", "off", "no"}
+
+
 def render_video(
     project: Path,
     *,
@@ -142,8 +146,9 @@ def render_video(
     fps = int(video_config.get("fps", 15))
     crf = int(video_config.get("crf", 21))
 
-    image_paths = [paths["images"] / f"场景_{index:02d}.jpg" for index in range(1, 5)]
-    audio_paths = [paths["voice"] / f"场景_{index:02d}.wav" for index in range(1, 5)]
+    scene_count = len(story["scenes"])
+    image_paths = [paths["images"] / f"场景_{index:02d}.jpg" for index in range(1, scene_count + 1)]
+    audio_paths = [paths["voice"] / f"场景_{index:02d}.wav" for index in range(1, scene_count + 1)]
     missing = [path for path in image_paths + audio_paths if not path.exists()]
     if missing:
         raise RuntimeError("合成前素材不完整：" + "、".join(str(path.name) for path in missing))
@@ -172,13 +177,13 @@ def render_video(
             "-vf", video_filter,
             "-t", f"{duration:.3f}", "-r", str(fps),
             "-c:v", "libx264", "-preset", "fast", "-crf", str(crf),
-            "-c:a", "aac", "-b:a", "128k", "-shortest",
+            "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-shortest",
             "-movflags", "+faststart", str(clip),
         ])
         clips.append(clip)
 
     ending_image = paths["images"] / "结尾页.jpg"
-    ending_duration = 1.0
+    ending_duration = float(video_config.get("ending_duration_seconds", 2.8))
     if ending_image.exists():
         print("正在将故事结尾作品页合入视频中...")
         ending_audio = paths["work"] / "结尾_silent.wav"
@@ -188,10 +193,11 @@ def render_video(
             "-t", f"{ending_duration:.3f}", str(ending_audio)
         ])
         
-        ending_clip = paths["work"] / "片段_05.mp4"
+        ending_clip = paths["work"] / f"片段_{scene_count + 1:02d}.mp4"
         ending_video_filter = (
             f"scale={width}:{height}:force_original_aspect_ratio=increase:in_range=full:out_range=tv,"
             f"crop={width}:{height},"
+            f"fade=t=in:st=0:d=0.35,fade=t=out:st={max(0.0, ending_duration - 0.45):.3f}:d=0.45,"
             "format=yuv420p,setsar=1"
         )
         run_command([
@@ -200,7 +206,7 @@ def render_video(
             "-vf", ending_video_filter,
             "-t", f"{ending_duration:.3f}", "-r", str(fps),
             "-c:v", "libx264", "-preset", "fast", "-crf", str(crf),
-            "-c:a", "aac", "-b:a", "128k", "-shortest",
+            "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-shortest",
             "-movflags", "+faststart", str(ending_clip),
         ])
         clips.append(ending_clip)
@@ -219,10 +225,10 @@ def render_video(
 
     bgm_enabled = bool(video_config.get("bgm_enabled", True))
     bgm_file: Path | None = None
-    if bgm_enabled:
+    if bgm_enabled and not _is_bgm_disabled(bgm or story.get("bgm")):
         if bgm:
             bgm_file = _resolve_bgm_path(bgm, config)
-        elif story.get("bgm"):
+        elif story.get("bgm") and story.get("bgm") != "自动匹配":
             bgm_file = _resolve_bgm_path(story["bgm"], config)
         else:
             bgm_file = _detect_bgm_from_story(story, config)

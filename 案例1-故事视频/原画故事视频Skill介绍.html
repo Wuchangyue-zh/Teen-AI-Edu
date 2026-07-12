@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="原画故事视频 Skill：从一段故事想法开始，先生成可编辑 Word 文稿，再制作竖版故事视频。">
+  <title>原画故事视频 · Skill 使用指南</title>
+  <style>
+    :root {
+      --paper: #f5f0e4;
+      --paper-deep: #e9dfca;
+      --ink: #172b3d;
+      --muted: #607080;
+      --red: #bd3e32;
+      --gold: #bd8b32;
+      --line: #d1c4ac;
+      --panel: rgba(255, 252, 245, .76);
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --serif: "Noto Serif SC", "Songti SC", STSong, serif;
+      --sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(189, 139, 50, .14), transparent 27rem),
+        linear-gradient(115deg, var(--paper) 0%, #faf7ef 45%, var(--paper-deep) 100%);
+      font-family: var(--sans);
+      line-height: 1.65;
+    }
+
+    .wrap { width: min(1120px, calc(100% - 40px)); margin: auto; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 0; border-bottom: 1px solid var(--line); font-size: 14px;
+    }
+    .brand { font-family: var(--serif); font-size: 18px; letter-spacing: .08em; }
+    .status { color: #346643; font-weight: 700; }
+    .status::before { content: "●"; color: #5b9a68; margin-right: 7px; }
+
+    .hero { min-height: 490px; display: grid; grid-template-columns: 1.12fr .88fr; align-items: center; gap: 58px; padding: 72px 0 84px; }
+    .eyebrow { color: var(--red); font-size: 12px; font-weight: 800; letter-spacing: .16em; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin: 12px 0 22px; font: 700 clamp(42px, 7vw, 80px)/1.12 var(--serif); letter-spacing: -.05em; }
+    h1 em { color: var(--red); font-style: normal; }
+    .lede { max-width: 560px; font: 400 19px/1.8 var(--serif); color: #394a56; }
+    .fact-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+    .fact { padding: 7px 11px; border: 1px solid var(--line); border-radius: 2px; background: rgba(255,255,255,.4); font-size: 13px; }
+
+    .reel {
+      position: relative; min-height: 330px; padding: 22px;
+      background: var(--ink); color: #f8ecd4; box-shadow: 16px 17px 0 rgba(189, 62, 50, .12);
+      transform: rotate(2deg);
+    }
+    .reel::before, .reel::after { content: ""; position: absolute; left: 22px; right: 22px; height: 8px; background: repeating-linear-gradient(90deg, #d8b978 0 15px, transparent 15px 28px); }
+    .reel::before { top: 14px; } .reel::after { bottom: 14px; }
+    .reel-kicker { margin-top: 31px; color: #d8b978; font: 700 11px/1 var(--mono); letter-spacing: .18em; }
+    .reel-title { margin: 25px 0 14px; font: 700 38px/1.2 var(--serif); }
+    .reel-copy { color: #d4dfe4; font-size: 14px; }
+    .reel-credit { position: absolute; right: 24px; bottom: 34px; color: #d8b978; font-size: 12px; }
+
+    .section { padding: 68px 0; border-top: 1px solid var(--line); }
+    .section-heading { display: grid; grid-template-columns: 150px 1fr; gap: 24px; margin-bottom: 32px; }
+    .section-index { color: var(--red); font: 700 13px/1.3 var(--mono); letter-spacing: .08em; padding-top: 9px; }
+    h2 { font: 700 clamp(28px, 4vw, 43px)/1.2 var(--serif); letter-spacing: -.03em; margin-bottom: 10px; }
+    .section-heading p { color: var(--muted); max-width: 650px; margin-bottom: 0; }
+
+    .capabilities { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 2px solid var(--ink); }
+    .capability { min-height: 185px; padding: 24px 21px; border-right: 1px solid var(--line); background: rgba(255,255,255,.25); }
+    .capability:last-child { border-right: 0; }
+    .capability b { display: block; margin-bottom: 10px; font: 700 22px/1.25 var(--serif); }
+    .capability p { color: var(--muted); font-size: 14px; margin: 0; }
+    .mark { color: var(--red); font: 700 18px/1 var(--mono); }
+
+    .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 20px; }
+    .stage { position: relative; min-height: 360px; padding: 28px 28px 26px; background: var(--panel); border: 1px solid var(--line); border-right: 0; }
+    .stage:last-child { border-right: 1px solid var(--line); }
+    .stage-number { color: var(--red); font: 700 13px var(--mono); }
+    .stage h3 { margin: 30px 0 12px; font: 700 27px/1.2 var(--serif); }
+    .stage p { color: var(--muted); font-size: 14px; min-height: 69px; }
+    .checkpoint { margin: 18px -8px 0; padding: 10px 11px; border-left: 3px solid var(--red); background: #fff7e8; color: #75443b; font-size: 13px; }
+    .stage.final { background: var(--ink); color: #f9f0dc; }
+    .stage.final p { color: #cbd7d9; }
+    .stage.final .stage-number { color: #e7bd6c; }
+    .stage.final .checkpoint { border-color: #e7bd6c; background: rgba(255,255,255,.09); color: #f9e9c7; }
+
+    .commands { display: grid; grid-template-columns: .75fr 1.25fr; gap: 28px; align-items: start; }
+    .guide-list { margin: 0; padding: 0; list-style: none; counter-reset: guide; }
+    .guide-list li { counter-increment: guide; position: relative; padding: 0 0 24px 49px; color: #42535e; }
+    .guide-list li::before { content: "0" counter(guide); position: absolute; left: 0; top: 0; color: var(--red); font: 700 15px var(--mono); }
+    .prompt-demo { position: relative; padding: 28px 28px 22px; background: #152a3a; color: #f5ead5; border-top: 5px solid var(--gold); box-shadow: 12px 12px 0 rgba(189, 62, 50, .10); }
+    .prompt-label { color: #dfbd76; font: 700 11px var(--mono); letter-spacing: .12em; }
+    .prompt-text { margin: 17px 0 0; white-space: pre-wrap; color: #f7efdf; font: 14px/1.8 var(--sans); }
+    .copy { position: absolute; right: 12px; top: 12px; padding: 6px 8px; border: 1px solid rgba(255,255,255,.35); background: transparent; color: #f5ead5; font: 11px var(--sans); cursor: pointer; }
+    .copy:hover { background: rgba(255,255,255,.13); }
+    .hint { margin-top: 18px; color: #c8d5d9; font-size: 13px; }
+
+    .guardrail { display: grid; grid-template-columns: 1.15fr .85fr; gap: 0; background: #fdf9ef; border: 1px solid var(--line); }
+    .guardrail > div { padding: 30px; }
+    .guardrail h3 { font: 700 24px/1.25 var(--serif); }
+    .guardrail p, .guardrail li { color: #53646d; font-size: 14px; }
+    .guardrail ul { padding-left: 19px; margin-bottom: 0; }
+    .guardrail .note { background: #e8dcbf; }
+    .path { padding: 3px 6px; background: #efe6d3; color: #544a3c; font: 12px var(--mono); }
+
+    footer { display: flex; justify-content: space-between; padding: 28px 0 42px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 800px) {
+      .hero, .commands, .guardrail { grid-template-columns: 1fr; }
+      .hero { padding: 48px 0 60px; gap: 38px; }
+      .reel { max-width: 440px; width: 92%; justify-self: center; }
+      .section-heading { grid-template-columns: 1fr; gap: 6px; }
+      .capabilities, .timeline { grid-template-columns: 1fr; }
+      .capability, .stage { border-right: 1px solid var(--line); border-bottom: 0; }
+      .stage:last-child { border-bottom: 1px solid var(--line); }
+      .stage { min-height: auto; }
+      .stage p { min-height: 0; }
+      footer { display: block; } footer span { display: block; margin-bottom: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="topbar" aria-label="页面导航">
+      <div class="brand">原画故事视频 / SKILL</div>
+      <div class="status">已完成真实 API 验收</div>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <div class="eyebrow">原画故事视频 SKILL</div>
+        <h1>故事，<br>变成<em>视频</em>。</h1>
+        <p class="lede">先确认 Word 文稿，再确认角色原型，最后生成配图、旁白与 3:4 竖版成片。</p>
+      </div>
+      <aside class="reel" aria-label="最终成片摘要">
+        <div class="reel-kicker">STORY VIDEO / 1080 × 1440</div>
+        <div class="reel-title">WORD<br>→ VIDEO</div>
+        <p class="reel-copy">原画配图 · 旁白字幕 · 背景音乐 · 结尾署名</p>
+        <div class="reel-credit">H.264 / AAC / MP4</div>
+      </aside>
+    </header>
+
+    <section class="section" id="capabilities">
+      <div class="section-heading"><div class="section-index">01 / 能力地图</div><div><h2>从故事文本开始的完整制作链。</h2><p>不需要传统剪辑软件。先描述一个故事，Skill 将文字、原画、声音与视频组织为可逐步确认的作品。</p></div></div>
+      <div class="capabilities">
+        <article class="capability"><div class="mark">01</div><b>故事先行</b><p>从一句故事想法扩展为“登场—困难—尝试—结局”的四幕结构。</p></article>
+        <article class="capability"><div class="mark">02</div><b>Word 审稿</b><p>先交付可编辑的文稿；角色、旁白、提示词与 BGM 都能在此确认。</p></article>
+        <article class="capability"><div class="mark">03</div><b>确认原型</b><p>先用原画生成单张角色原型；确认外形、颜色和结构后才生成四幕场景。</p></article>
+        <article class="capability"><div class="mark">04</div><b>场景到成片</b><p>生成四幕配图和旁白，自动合成字幕、背景音乐与手机友好的 MP4。</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="workflow">
+      <div class="section-heading"><div class="section-index">02 / 制作流程</div><div><h2>文本起步，四阶段、三次确认。</h2><p>先确认文稿，再确认角色原型；前三步都停下来检查，避免角色走样后整批返工。</p></div></div>
+      <div class="timeline">
+        <article class="stage"><div class="stage-number">STAGE 01</div><h3>讲故事，出文稿</h3><p>先说清角色、想去哪里、遇到什么困难和希望的气氛。Skill 生成初版 <b>故事.docx</b>，此时不需要原画。</p><div class="checkpoint">确认点 1：打开 Word，直接修改并保存。</div></article>
+        <article class="stage"><div class="stage-number">STAGE 02</div><h3>加入原画，定原型</h3><p>文稿确认后再提供原画。此时只生成角色原型，不生成场景图或旁白。</p><div class="checkpoint">确认点 2：确认角色外形、颜色和手绘气质。</div></article>
+        <article class="stage"><div class="stage-number">STAGE 03</div><h3>出场景，听旁白</h3><p>只使用已确认的原型生成四幕配图和旁白；图片会自动写回 Word。</p><div class="checkpoint">确认点 3：检查配图与音频，再决定是否合成。</div></article>
+        <article class="stage final"><div class="stage-number">STAGE 04</div><h3>合成并交付</h3><p>将图片、声音、字幕、BGM 和结尾署名页合成 1080×1440 MP4，并执行完整性校验。</p><div class="checkpoint">交付：分享前检查不希望公开的信息。</div></article>
+      </div>
+    </section>
+
+    <section class="section" id="howto">
+      <div class="section-heading"><div class="section-index">03 / 直接启动</div><div><h2>复制一段话，就能从故事开始。</h2><p>不需要输入命令。把下面的示例作为第一条消息发给 Agent；它会先与你共创故事，再只生成 Word 文稿并停下来等待确认。</p></div></div>
+      <div class="commands">
+        <ol class="guide-list">
+          <li><b>先说故事</b><br>只需给出角色、发生的事和你想要的感觉。原画和声音可以在文稿确认后再准备。</li>
+          <li><b>确认 Word</b><br>在 Word 中修改旁白、画面提示词、配音音色和背景音乐；确认后再提交原画。</li>
+          <li><b>确认原型</b><br>Agent 只生成角色原型。先检查角色是否像你想象的那样，再允许生成四幕场景。</li>
+          <li><b>继续制作</b><br>Agent 再生成图片、声音与视频；不满意时，用自然语言说“重做第二幕”即可。</li>
+        </ol>
+        <div class="prompt-demo" aria-label="可复制的启动提示词">
+          <button class="copy" data-copy="请帮我用「原画故事视频」Skill，为小学六年级学生创作一个可微信分享的竖版故事视频。&#10;&#10;故事想法：诸葛亮接到寻找失落军令的任务，意外穿越到今天的校园。他要在放学前找到线索，回到三国。&#10;&#10;风格：轻松、有智慧、不说教。&#10;&#10;请先给我三个一句话故事方向。选定后，只生成可编辑的 故事.docx 文稿，并停下来等我确认；现在不要生成图片、声音或视频。">复制提示词</button>
+          <div class="prompt-label">复制后，直接粘贴给 Agent</div>
+          <div class="prompt-text">请帮我用「原画故事视频」Skill，为小学六年级学生创作一个可微信分享的竖版故事视频。<br><br>故事想法：诸葛亮接到寻找失落军令的任务，意外穿越到今天的校园。他要在放学前找到线索，回到三国。<br><br>风格：轻松、有智慧、不说教。<br><br>请先给我三个一句话故事方向。选定后，只生成可编辑的 <b>故事.docx</b> 文稿，并停下来等我确认；现在不要生成图片、声音或视频。</div>
+          <p class="hint">文稿确认后先补充一句：<b>“这是我的原画，请只生成角色原型并停下来等我确认。”</b><br>原型确认后再说：<b>“请使用已确认的角色原型生成四幕配图和旁白。”</b></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="guardrails">
+      <div class="section-heading"><div class="section-index">04 / 关键约定</div><div><h2>创作方便，也要可控。</h2><p>这几条规则能让项目安全、可复用，并让最终成片真正反映 Word 中的最新修改。</p></div></div>
+      <div class="guardrail">
+        <div><h3>编辑与重做</h3><ul><li><b>故事.docx</b> 是核心编辑入口；保留旁白和提示词的开始/结束标记。</li><li>原型不满意时，先修改角色设定并重做原型；未确认前不要生成四幕场景。</li><li>只重做一幕时，直接告诉 Agent “重做第 N 幕”；其他素材不会重复生成。</li></ul></div>
+        <div class="note"><h3>素材与隐私</h3><p>在第二阶段上传原画前确认拥有使用权；上传声音前获得录音者明确同意。不要把完整姓名、住址、学校、联系方式写入项目名、故事或提示词。</p><p><b>最终产物：</b><br><span class="path">故事.docx</span> · <span class="path">故事视频.mp4</span> · 图片/ · 声音/</p></div>
+      </div>
+    </section>
+
+    <footer><span>原画故事视频 Skill · 从文本故事到竖版视频</span><span>第一步：复制提示词，先拿到 Word 文稿</span></footer>
+  </main>
+  <script>
+    document.querySelectorAll('.copy').forEach((button) => {
+      button.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(button.dataset.copy); } catch { /* 浏览器不支持时保留页面内容供手动复制 */ }
+        const original = button.textContent;
+        button.textContent = '已复制';
+        setTimeout(() => { button.textContent = original; }, 1200);
+      });
+    });
+  </script>
+</body>
+</html>

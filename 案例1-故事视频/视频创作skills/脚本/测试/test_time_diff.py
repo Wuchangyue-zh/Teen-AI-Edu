@@ -18,7 +18,7 @@ def test_preset():
     payload = {
         "model": "mimo-v2.5-tts",
         "messages": [
-            {"role": "user", "content": "自然、清晰、温暖的讲故事语气，语速稍慢，适合小学生听。"},
+            {"role": "user", "content": "自然、清晰、温暖的讲故事语气，语速稍慢，适合日常故事分享。"},
             {"role": "assistant", "content": "苏轼和王安石是宋代非常有名的文学家，他们曾经是很好的朋友，也写过很多美妙的诗歌。"},
         ],
         "audio": {
@@ -59,7 +59,7 @@ def test_clone(reference_path: Path):
     payload = {
         "model": "mimo-v2.5-tts-voiceclone",
         "messages": [
-            {"role": "user", "content": "自然、清晰、温暖的讲故事语气，语速稍慢，适合小学生听。"},
+            {"role": "user", "content": "自然、清晰、温暖的讲故事语气，语速稍慢，适合日常故事分享。"},
             {"role": "assistant", "content": "苏轼和王安石是宋代非常有名的文学家，他们曾经是很好的朋友，也写过很多美妙的诗歌。"},
         ],
         "audio": {
