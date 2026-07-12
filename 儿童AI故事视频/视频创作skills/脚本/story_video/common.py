@@ -102,7 +102,7 @@ def http_json(
             last_error = RuntimeError(f"接口返回 HTTP {exc.code}: {detail}")
             if exc.code not in {408, 429, 500, 502, 503, 504}:
                 raise last_error
-        except (urllib.error.URLError, TimeoutError) as exc:
+        except Exception as exc:
             last_error = exc
         if attempt < retries:
             time.sleep(2 ** attempt)
@@ -160,11 +160,20 @@ def ensure_project_dirs(project: Path) -> dict[str, Path]:
 def validate_story(story: dict[str, Any]) -> None:
     if not str(story.get("title", "")).strip():
         raise RuntimeError("故事缺少 title。")
-    character = story.get("character")
-    if not isinstance(character, dict) or not str(character.get("name", "")).strip():
-        raise RuntimeError("故事缺少 character.name。")
-    if not str(character.get("subject_type", "")).strip():
-        raise RuntimeError("故事缺少 character.subject_type。请标记主角是人物、动物、物品、植物、车辆还是建筑。")
+    
+    characters = story.get("characters", [])
+    if not characters and "character" in story:
+        characters = [story["character"]]
+        
+    if not characters:
+        raise RuntimeError("故事缺少角色设定 (characters)。")
+        
+    for idx, character in enumerate(characters, 1):
+        if not isinstance(character, dict) or not str(character.get("name", "")).strip():
+            raise RuntimeError(f"第 {idx} 个角色缺少 name。")
+        if not str(character.get("subject_type", "")).strip():
+            raise RuntimeError(f"第 {idx} 个角色缺少 subject_type。请标记是人物、动物、物品、植物、车辆还是建筑。")
+            
     scenes = story.get("scenes")
     if not isinstance(scenes, list) or len(scenes) != 4:
         raise RuntimeError("MVP 故事必须正好包含四幕 scenes。")

@@ -177,6 +177,34 @@ def render_video(
         ])
         clips.append(clip)
 
+    ending_image = paths["images"] / "结尾页.jpg"
+    ending_duration = 1.0
+    if ending_image.exists():
+        print("正在将故事结尾作品页合入视频中...")
+        ending_audio = paths["work"] / "结尾_silent.wav"
+        run_command([
+            "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+            "-f", "lavfi", "-i", "anullsrc=r=44100:cl=mono",
+            "-t", f"{ending_duration:.3f}", str(ending_audio)
+        ])
+        
+        ending_clip = paths["work"] / "片段_05.mp4"
+        ending_video_filter = (
+            f"scale={width}:{height}:force_original_aspect_ratio=increase:in_range=full:out_range=tv,"
+            f"crop={width}:{height},"
+            "format=yuv420p,setsar=1"
+        )
+        run_command([
+            "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+            "-loop", "1", "-i", str(ending_image), "-i", str(ending_audio),
+            "-vf", ending_video_filter,
+            "-t", f"{ending_duration:.3f}", "-r", str(fps),
+            "-c:v", "libx264", "-preset", "fast", "-crf", str(crf),
+            "-c:a", "aac", "-b:a", "128k", "-shortest",
+            "-movflags", "+faststart", str(ending_clip),
+        ])
+        clips.append(ending_clip)
+
     concat_file = paths["work"] / "片段列表.txt"
     concat_file.write_text(
         "\n".join(f"file '{path.as_posix().replace(chr(39), chr(39) + chr(92) + chr(39) + chr(39))}'" for path in clips) + "\n",
@@ -203,6 +231,8 @@ def render_video(
         try:
             print(f"应用背景音乐：{bgm_file.name}")
             total_duration = sum(_audio_duration(audio) for audio in audio_paths)
+            if ending_image.exists():
+                total_duration += ending_duration
             bgm_volume = float(video_config.get("bgm_volume", 0.12))
             
             fade_duration = 1.5

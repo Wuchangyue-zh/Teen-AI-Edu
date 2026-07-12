@@ -83,10 +83,11 @@ def build_parser() -> argparse.ArgumentParser:
     images.add_argument("--scene", type=int, choices=range(1, 5), help="只处理指定场景")
     images.add_argument("--force", action="store_true", help="覆盖已有结果")
 
-    voice = sub.add_parser("voice", help="使用小米 MiMo 克隆参考声音")
+    voice = sub.add_parser("voice", help="使用小米 MiMo 生成旁白音频")
     add_project_argument(voice)
     voice.add_argument("--scene", type=int, choices=range(1, 5), help="只处理指定场景")
     voice.add_argument("--force", action="store_true", help="覆盖已有结果")
+    voice.add_argument("--preset", help="指定小米官方内置音色（如：冰糖、苏打、茉莉、白桦）")
 
     render = sub.add_parser("render", help="合成3:4 MP4并生成字幕")
     add_project_argument(render)
@@ -103,7 +104,8 @@ def build_parser() -> argparse.ArgumentParser:
     add_project_argument(all_cmd)
     all_cmd.add_argument("--drawing", required=True, help="孩子原画路径")
     all_cmd.add_argument("--story", required=True, help="四幕故事 JSON 路径")
-    all_cmd.add_argument("--voice", required=True, help="15-30秒参考声音路径")
+    all_cmd.add_argument("--voice", help="15-30秒参考声音路径；使用官方内置音色时无需提供")
+    all_cmd.add_argument("--preset", help="指定小米官方内置音色（如：冰糖、苏打、茉莉、白桦）")
     all_cmd.add_argument("--bgm", help="指定背景音乐，可以是文件名（如 卡农.mp3）或路径")
     all_cmd.add_argument("--force", action="store_true", help="覆盖已有结果")
     return parser
@@ -153,6 +155,7 @@ def main() -> int:
                 config=config,
                 scene=getattr(args, "scene", None),
                 force=getattr(args, "force", False),
+                preset_override=getattr(args, "preset", None),
             )
         if args.command in {"render", "all"}:
             final = render_video(

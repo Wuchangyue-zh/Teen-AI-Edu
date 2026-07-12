@@ -24,6 +24,12 @@ def initialize_project(
 
     story = load_json(story_path)
     validate_story(story)
+    
+    if "characters" not in story and "character" in story:
+        story["characters"] = [story["character"]]
+    elif "characters" in story and "character" not in story and story["characters"]:
+        story["character"] = story["characters"][0]
+        
     paths = ensure_project_dirs(project)
 
     drawing_target = paths["input"] / f"原始手绘{drawing.suffix.lower()}"

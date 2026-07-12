@@ -16,14 +16,32 @@ def generate_initial_docx(project_dir: Path, story_path: Path, output_docx_path:
     if creator:
         doc.add_paragraph(f"创作者：{creator}")
     
-    doc.add_heading("角色设定", level=1)
-    char = story.get("character", {})
+    characters = story.get("characters", [])
+    if not characters and "character" in story:
+        characters = [story["character"]]
+        
+    if not characters:
+        characters = [{
+            "name": "角色一",
+            "subject_type": "object",
+            "appearance": "",
+            "personality": "",
+            "special_ability": ""
+        }]
+        
+    for idx, char in enumerate(characters, 1):
+        heading_text = f"角色设定 {idx}" if len(characters) > 1 else "角色设定"
+        doc.add_heading(heading_text, level=1)
+        p = doc.add_paragraph()
+        p.add_run(f"★ 名字：{char.get('name', '无')}\n")
+        p.add_run(f"★ 类型：{char.get('subject_type', '无')}\n")
+        p.add_run(f"★ 外貌：{char.get('appearance', '无')}\n")
+        p.add_run(f"★ 性格：{char.get('personality', '无')}\n")
+        p.add_run(f"★ 特殊能力：{char.get('special_ability', '无')}\n")
+    
+    doc.add_heading("配音设定", level=1)
     p = doc.add_paragraph()
-    p.add_run(f"★ 名字：{char.get('name', '无')}\n")
-    p.add_run(f"★ 类型：{char.get('subject_type', '无')}\n")
-    p.add_run(f"★ 外貌：{char.get('appearance', '无')}\n")
-    p.add_run(f"★ 性格：{char.get('personality', '无')}\n")
-    p.add_run(f"★ 特殊能力：{char.get('special_ability', '无')}\n")
+    p.add_run(f"★ 配音音色：{story.get('voice', '冰糖')} (仅在无个性化录音时生效，可选官方音色: 冰糖、苏打、茉莉、白桦)\n")
     
     doc.add_heading("画面风格", level=1)
     doc.add_paragraph(story.get("style", "无"))
@@ -52,22 +70,33 @@ def update_docx_with_images(project_dir: Path, story_path: Path, output_docx_pat
     if creator:
         doc.add_paragraph(f"创作者：{creator}")
         
-    doc.add_heading("角色设定", level=1)
-    char = story.get("character", {})
+    characters = story.get("characters", [])
+    if not characters and "character" in story:
+        characters = [story["character"]]
+        
+    for idx, char in enumerate(characters, 1):
+        heading_text = f"角色设定 {idx}" if len(characters) > 1 else "角色设定"
+        doc.add_heading(heading_text, level=1)
+        p = doc.add_paragraph()
+        p.add_run(f"★ 名字：{char.get('name', '无')}\n")
+        p.add_run(f"★ 类型：{char.get('subject_type', '无')}\n")
+        p.add_run(f"★ 外貌：{char.get('appearance', '无')}\n")
+        p.add_run(f"★ 性格：{char.get('personality', '无')}\n")
+        p.add_run(f"★ 特殊能力：{char.get('special_ability', '无')}\n")
+        
+        char_ref_new = images_dir / f"角色参考_{idx}.jpg"
+        char_ref_old = images_dir / "角色参考.jpg"
+        char_ref = char_ref_new if char_ref_new.exists() else char_ref_old
+        if char_ref.exists() and (idx == 1 or char_ref == char_ref_new):
+            doc.add_paragraph("【角色标准参考图】")
+            doc.add_picture(str(char_ref), width=Inches(3.5))
+        
+    doc.add_heading("配音设定", level=1)
     p = doc.add_paragraph()
-    p.add_run(f"★ 名字：{char.get('name', '无')}\n")
-    p.add_run(f"★ 类型：{char.get('subject_type', '无')}\n")
-    p.add_run(f"★ 外貌：{char.get('appearance', '无')}\n")
-    p.add_run(f"★ 性格：{char.get('personality', '无')}\n")
-    p.add_run(f"★ 特殊能力：{char.get('special_ability', '无')}\n")
+    p.add_run(f"★ 配音音色：{story.get('voice', '冰糖')} (仅在无个性化录音时生效，可选官方音色: 冰糖、苏打、茉莉、白桦)\n")
     
     doc.add_heading("画面风格", level=1)
     doc.add_paragraph(story.get("style", "无"))
-    
-    char_ref = images_dir / "角色参考.jpg"
-    if char_ref.exists():
-        doc.add_heading("角色标准参考图", level=1)
-        doc.add_picture(str(char_ref), width=Inches(3.5))
         
     doc.add_heading("故事内容", level=1)
     for scene in story.get("scenes", []):
@@ -104,11 +133,14 @@ def parse_docx_to_story(docx_path: Path) -> dict[str, Any]:
             "personality": "",
             "special_ability": ""
         },
+        "characters": [],
         "style": "",
         "scenes": []
     }
     
     current_section = None
+    current_character: dict[str, Any] = {}
+    characters: list[dict[str, Any]] = []
     current_scene: dict[str, Any] = {}
     collecting_mode = None  # "narration" or "visual_prompt"
     collected_text = []
@@ -122,40 +154,71 @@ def parse_docx_to_story(docx_path: Path) -> dict[str, Any]:
             story["title"] = text
             continue
 
-        if text.startswith("创作者：") or text.startswith("创作者:"):
-            parts = text.split("：", 1) if "：" in text else text.split(":", 1)
-            story["creator_display"] = parts[1].strip()
+        creator_match = re.match(r"^(?:创作者|作者|制作人|作者姓名)\s*[：:]\s*(.*)$", text)
+        if creator_match:
+            story["creator_display"] = creator_match.group(1).strip()
             continue
 
         if p.style.name.startswith("Heading"):
             val = text.replace(" ", "")
-            if "角色设定" in val:
+            if re.match(r"角色设定\s*(\d+)?", val):
                 current_section = "character"
+                if current_character:
+                    characters.append(current_character)
+                current_character = {
+                    "name": "",
+                    "subject_type": "object",
+                    "appearance": "",
+                    "personality": "",
+                    "special_ability": ""
+                }
+            elif "配音设定" in val:
+                current_section = "voice"
+                if current_character:
+                    characters.append(current_character)
+                    current_character = {}
             elif "画面风格" in val:
                 current_section = "style"
+                if current_character:
+                    characters.append(current_character)
+                    current_character = {}
             elif "故事内容" in val:
                 current_section = "scenes"
+                if current_character:
+                    characters.append(current_character)
+                    current_character = {}
             continue
 
-        if current_section == "character":
+        if current_section == "character" and current_character is not None:
             lines = text.split("\n")
             for line in lines:
                 line = line.strip()
                 if "★ 名字：" in line or "★ 名字:" in line:
                     parts = line.split("：", 1) if "：" in line else line.split(":", 1)
-                    story["character"]["name"] = parts[1].strip()
+                    current_character["name"] = parts[1].strip()
                 elif "★ 类型：" in line or "★ 类型:" in line:
                     parts = line.split("：", 1) if "：" in line else line.split(":", 1)
-                    story["character"]["subject_type"] = parts[1].strip()
+                    current_character["subject_type"] = parts[1].strip()
                 elif "★ 外貌：" in line or "★ 外貌:" in line:
                     parts = line.split("：", 1) if "：" in line else line.split(":", 1)
-                    story["character"]["appearance"] = parts[1].strip()
+                    current_character["appearance"] = parts[1].strip()
                 elif "★ 性格：" in line or "★ 性格:" in line:
                     parts = line.split("：", 1) if "：" in line else line.split(":", 1)
-                    story["character"]["personality"] = parts[1].strip()
+                    current_character["personality"] = parts[1].strip()
                 elif "★ 特殊能力：" in line or "★ 特殊能力:" in line:
                     parts = line.split("：", 1) if "：" in line else line.split(":", 1)
-                    story["character"]["special_ability"] = parts[1].strip()
+                    current_character["special_ability"] = parts[1].strip()
+            continue
+
+        if current_section == "voice":
+            lines = text.split("\n")
+            for line in lines:
+                line = line.strip()
+                if any(k in line for k in ["★ 配音音色：", "★ 配音音色:", "★ 声音：", "★ 声音:"]):
+                    parts = line.split("：", 1) if "：" in line else line.split(":", 1)
+                    val = parts[1].strip()
+                    val = re.split(r'[\(\s]', val)[0].strip()
+                    story["voice"] = val
             continue
 
         if current_section == "style":
@@ -225,8 +288,14 @@ def parse_docx_to_story(docx_path: Path) -> dict[str, Any]:
                         collected_text.append(text)
                     continue
 
+    if current_character:
+        characters.append(current_character)
     if current_scene:
         story["scenes"].append(current_scene)
+
+    story["characters"] = [c for c in characters if c.get("name")]
+    if story["characters"]:
+        story["character"] = story["characters"][0]
 
     if not story["title"] or story["title"] == "未命名故事":
         if doc.paragraphs:

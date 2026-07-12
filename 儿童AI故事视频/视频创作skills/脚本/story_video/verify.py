@@ -11,8 +11,11 @@ def verify_project(project: Path, *, config: dict[str, Any]) -> dict[str, Any]:
     final = paths["final"] / "故事视频.mp4"
     expected_images = [paths["images"] / f"场景_{index:02d}.jpg" for index in range(1, 5)]
     expected_audio = [paths["voice"] / f"场景_{index:02d}.wav" for index in range(1, 5)]
+    has_char_ref = (paths["images"] / "角色参考.jpg").exists() or any(
+        (paths["images"] / f"角色参考_{idx}.jpg").exists() for idx in range(1, 10)
+    )
     checks: dict[str, bool] = {
-        "角色标准图存在": (paths["images"] / "角色参考.jpg").exists(),
+        "角色标准图存在": has_char_ref,
         "四幕图片齐全": all(path.exists() for path in expected_images),
         "四幕旁白齐全": all(path.exists() for path in expected_audio),
         "最终视频存在": final.exists(),

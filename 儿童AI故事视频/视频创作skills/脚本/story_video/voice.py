@@ -35,23 +35,40 @@ def _normalize_voice(source: Path, target: Path) -> Path:
 def _synthesize(
     *,
     text: str,
-    reference: Path,
+    reference: Path | None,
+    preset_voice: str | None,
     output: Path,
     config: dict[str, Any],
 ) -> Path:
     voice_config = config["voice"]
-    payload = {
-        "model": voice_config["model"],
-        "messages": [
-            {"role": "user", "content": voice_config.get("instruction", "自然的中文讲故事语气。")},
-            {"role": "assistant", "content": text},
-        ],
-        "audio": {
-            "format": voice_config.get("format", "wav"),
-            "voice": audio_data_uri(reference),
-        },
-        "stream": False,
-    }
+    
+    if reference:
+        payload = {
+            "model": "mimo-v2.5-tts-voiceclone",
+            "messages": [
+                {"role": "user", "content": voice_config.get("instruction", "自然的中文讲故事语气。")},
+                {"role": "assistant", "content": text},
+            ],
+            "audio": {
+                "format": voice_config.get("format", "wav"),
+                "voice": audio_data_uri(reference),
+            },
+            "stream": False,
+        }
+    else:
+        payload = {
+            "model": "mimo-v2.5-tts",
+            "messages": [
+                {"role": "user", "content": voice_config.get("instruction", "自然的中文讲故事语气。")},
+                {"role": "assistant", "content": text},
+            ],
+            "audio": {
+                "format": voice_config.get("format", "wav"),
+                "voice": preset_voice or "冰糖",
+            },
+            "stream": False,
+        }
+
     data = http_json(
         MIMO_URL,
         payload=payload,
@@ -77,13 +94,31 @@ def generate_voice(
     config: dict[str, Any],
     scene: int | None = None,
     force: bool = False,
+    preset_override: str | None = None,
 ) -> list[Path]:
     from .docx_helper import sync_docx_to_json
     sync_docx_to_json(project)
     paths = ensure_project_dirs(project)
     story = load_json(paths["text"] / "故事.json")
-    source = find_single_input(paths["input"], "声音参考")
-    normalized = _normalize_voice(source, paths["work"] / "声音参考_24k.wav")
+    source = None
+    try:
+        source = find_single_input(paths["input"], "声音参考")
+    except RuntimeError:
+        pass
+
+    normalized = None
+    preset_voice_name = None
+    if source:
+        normalized = _normalize_voice(source, paths["work"] / "声音参考_24k.wav")
+        print(f"【声音生成】检测到个性化参考声音：{source.name}，启动「声音克隆」模式（模型：mimo-v2.5-tts-voiceclone）。")
+    else:
+        preset_voice_name = (
+            preset_override 
+            or story.get("voice") 
+            or config.get("voice", {}).get("preset_voice", "冰糖")
+        )
+        print(f"【声音生成】未检测到个性化参考声音，启动「内置预置音色」模式。所选音色：{preset_voice_name}（模型：mimo-v2.5-tts）。")
+    
     selected = {scene} if scene else {1, 2, 3, 4}
     outputs: list[Path] = []
     for scene_data in story["scenes"]:
@@ -101,6 +136,7 @@ def generate_voice(
         _synthesize(
             text=scene_data["narration"],
             reference=normalized,
+            preset_voice=preset_voice_name,
             output=output,
             config=config,
         )

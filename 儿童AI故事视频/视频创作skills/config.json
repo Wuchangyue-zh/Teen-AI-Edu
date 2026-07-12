@@ -4,7 +4,7 @@
     "model": "doubao-seedream-4-5-251128",
     "width": 1728,
     "height": 2304,
-    "max_retries": 2,
+    "max_retries": 5,
     "timeout_seconds": 300,
     "watermark": false
   },
@@ -14,7 +14,14 @@
     "format": "wav",
     "instruction": "自然、清晰、温暖的中文讲故事语气，语速稍慢，适合小学生听。",
     "max_retries": 2,
-    "timeout_seconds": 180
+    "timeout_seconds": 180,
+    "preset_voice": "冰糖",
+    "preset_voices": {
+      "小孩女": "冰糖",
+      "小孩男": "苏打",
+      "成年女": "茉莉",
+      "成年男": "白桦"
+    }
   },
   "video": {
     "width": 1080,
