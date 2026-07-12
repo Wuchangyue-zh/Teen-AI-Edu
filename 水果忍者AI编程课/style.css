@@ -116,4 +116,9 @@ button.cam { background: linear-gradient(135deg, #4dabf7, #3bc9db); box-shadow: 
 #modeTip {
   position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.45); color: #fff; padding: 8px 18px;
-  border-radius: 999px;
+  border-radius: 999px; font-size: 16px; font-weight: bold;
+  pointer-events: none; z-index: 5;
+}
+
+/* 提示里的代码样式 */
+.hint code { background: rgba(255, 255, 255, 0.15); padding: 1px 6px; border-radius: 5px; font-size: 13px; }
