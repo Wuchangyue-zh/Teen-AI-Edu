@@ -1,0 +1,8 @@
+Use case: illustration-story
+Asset type: WeChat custom animated sticker storyboard, to be cut into GIF frames
+Primary request: An original cute little ox office worker self-deprecatingly reacts to "I thought I could leave work, but an urgent task arrived" through a clear four-beat action: 1) slumped at a tiny laptop, typing with tired eyes and dark circles; 2) sees a small office clock showing six and eyes light up in hopeful surprise; 3) happily jumps up with both little hooves raised, briefcase bouncing; 4) a harmless exaggerated red urgent-task paper and notification symbol gently bonk the ox back into the same typing-at-laptop pose, with a resigned tiny smile, designed to loop to frame 1.
+Style/medium: original polished 2D Chinese chat-sticker illustration, rounded cute proportions, bold clean dark outlines, high-contrast flat warm colours, comic exaggeration, expressive face, funny rather than gloomy.
+Composition/framing: one perfectly regular 2 by 2 storyboard grid. Four equal square panels with generous safe padding; same ox character, scale, viewpoint and desk position in every panel; thin pale-gray divider lines only.
+Scene/backdrop: perfectly flat solid #00ff00 chroma-key background in every panel; no gradients, floor, cast shadows, reflections, texture, watermark, decorative borders, panel labels, logos, or readable text.
+Text (verbatim): "NONE"
+Constraints: every panel is a distinct sequential pose; keep the laptop, clock and red paper simple and large; the final pose must visually echo the first pose for a natural looping GIF; no other characters, no brands, no political symbols.

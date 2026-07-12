@@ -56,15 +56,33 @@ PYTHONPATH=儿童AI故事视频/视频创作skills python3 儿童AI故事视频/
 
 ## 🚀 视频生成命令指引
 
-通常，在支持 Agent Skills 的编辑器（如 WorkBuddy、TRAE）中，您可以直接使用自然语言给 AI 派发任务，系统将自动识别 Skill 并调用脚本。如果您需要手动执行脚本，可以使用以下命令：
+通常，在支持 Agent Skills 的编辑器（如 WorkBuddy、TRAE）中，您可以直接使用自然语言给 AI 派发任务，系统将自动识别 Skill 并调用脚本。如果您需要手动执行脚本，请遵循以下三阶段命令（中途有停顿核对点）：
 
+### 阶段 1：生成文稿并导出 DOCX
 ```bash
-# 执行全部步骤：初始化、生图、克隆声音并合成视频
-PYTHONPATH=儿童AI故事视频/视频创作skills/脚本 python3 儿童AI故事视频/视频创作skills/脚本/run.py all \
+PYTHONPATH=儿童AI故事视频/视频创作skills/脚本 python3 儿童AI故事视频/视频创作skills/脚本/run.py init \
   --project "儿童AI故事视频/小小创作者001" \
   --drawing "您的原画图片路径.jpg" \
-  --voice "参考录音路径.wav" \
-  --story "儿童AI故事视频/视频创作skills/参考/story.example.json"
+  --story "儿童AI故事视频/视频创作skills/参考/story.example.json" \
+  --voice "参考录音路径.wav"
+```
+*请核对项目目录下的 `故事.docx` 文档并保存修改后再继续。*
+
+### 阶段 2：生成故事配图与声音旁白
+```bash
+# 生成配图并自动插入 Word
+PYTHONPATH=儿童AI故事视频/视频创作skills/脚本 python3 儿童AI故事视频/视频创作skills/脚本/run.py images --project "儿童AI故事视频/小小创作者001"
+
+# 生成各幕旁白音频
+PYTHONPATH=儿童AI故事视频/视频创作skills/脚本 python3 儿童AI故事视频/视频创作skills/脚本/run.py voice --project "儿童AI故事视频/小小创作者001"
+```
+*请重新打开 `故事.docx` 检查画面和排版，并在 `声音/` 目录下试听旁白后再继续。*
+
+### 阶段 3：合成最终故事视频
+```bash
+# 合成 3:4 故事视频并完成校验
+PYTHONPATH=儿童AI故事视频/视频创作skills/脚本 python3 儿童AI故事视频/视频创作skills/脚本/run.py render --project "儿童AI故事视频/小小创作者001"
+PYTHONPATH=儿童AI故事视频/视频创作skills/脚本 python3 儿童AI故事视频/视频创作skills/脚本/run.py verify --project "儿童AI故事视频/小小创作者001"
 ```
 
-更多指令与参数细节请阅读 `儿童AI故事视频/视频创作skills/README.md`。
+更多指令与参数细节请阅读 [儿童AI故事视频/README.md](file:///Users/dielangli/Desktop/AI%E9%9D%92%E5%B0%91%E5%B9%B4%E5%9F%B9%E8%AE%AD/%E5%84%BF%E7%AB%A5AI%E6%95%85%E4%BA%8B%E8%A7%86%E9%A2%91/README.md)。

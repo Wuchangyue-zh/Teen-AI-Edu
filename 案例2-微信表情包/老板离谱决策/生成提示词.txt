@@ -1,0 +1,9 @@
+Use case: illustration-story
+Asset type: WeChat custom animated sticker storyboard, to be cut into GIF frames
+Primary request: An original round-faced overworked office worker reacting to the boss's absurd decisions, in four beats: 1) energetic and obedient, happily typing on a small floating keyboard with a bright smile; 2) a crooked glowing yellow lightbulb floats above his head (the boss's wild idea), he tilts his head and raises an eyebrow, full of confusion; 3) the lightbulb pops into a tangle of messy wires and spinning question-mark swirls, his eyes become dizzy spiral swirls, mouth twitches, steam rises from his head, his soul half floats out of his body; 4) he is squashed crooked by a floating mountain of paperwork but keeps typing, wearing a dead-inside forced smile.
+Style/medium: original polished 2D Chinese chat-sticker illustration, bold thick dark outlines, high-contrast flat colours, highly expressive face, simple rounded shapes.
+Composition/framing: one perfectly regular 2 by 2 storyboard grid; four equal square panels; same character scale, viewpoint (front upper-body, floating, NO desk/table/floor) and placement; generous padding; thin pale-gray divider lines only.
+Scene/backdrop: perfectly flat solid pure white #FFFFFF background in every panel; no gradients, floor, shadows, reflections, texture, watermark, decorative borders, or panel labels.
+Text (verbatim): panel 1 "在的"; panel 2 "您说"; panel 3 "？？？"; panel 4 "好的"
+Text design: large, bold, high-contrast Chinese lettering in a clear empty area; text must be correct and legible at 240 by 240 pixels.
+Constraints: each panel is a distinct sequential pose; preserve character identity and placement; no other characters, no logos, no real people, no brands.

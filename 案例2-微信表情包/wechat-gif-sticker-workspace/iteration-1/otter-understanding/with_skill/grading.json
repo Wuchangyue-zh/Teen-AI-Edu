@@ -1,0 +1,27 @@
+{
+  "expectations": [
+    {
+      "text": "输出有独立项目目录，并保留提示词、分镜原图、拆分帧、GIF 与质量报告。",
+      "passed": true,
+      "evidence": "otter-dongle 含 brief.md、prompt.txt、source/storyboard.png、frames/frame_01.png 至 frame_04.png、output/otter-dongle.gif、output/poster.png 和 report/quality.json。"
+    },
+    {
+      "text": "最终文件是循环 GIF，边长不超过 240 像素，文件不超过 500 KB，且至少有 4 帧。",
+      "passed": true,
+      "evidence": "quality.json 记录 GIF、[240, 240]、4 帧、46,922 bytes；Pillow 复核 loop=0。"
+    },
+    {
+      "text": "动作序列可读：认真听、放空、领悟、确认四个节奏清楚，角色在各帧中一致。",
+      "passed": true,
+      "evidence": "人工查看 report/contact-sheet.png：四个相同海獭角色依次为合掌倾听、空白眼神、举爪灵光、竖拇指微笑。"
+    }
+  ],
+  "summary": {"passed": 3, "failed": 0, "total": 3, "pass_rate": 1.0},
+  "claims": [
+    {"claim": "成品可按保守微信自定义表情目标导入", "type": "quality", "verified": true, "evidence": "格式、尺寸、大小、循环与帧数均被报告和 Pillow 复核。"}
+  ],
+  "eval_feedback": {
+    "suggestions": [{"reason": "下一轮可加入一个 2×3 分镜和一个无绿色背景的失败场景，以验证网格与抠图异常的恢复策略。"}],
+    "overall": "当前评测覆盖了核心成品与视觉可读性；尚未覆盖异常素材。"
+  }
+}
