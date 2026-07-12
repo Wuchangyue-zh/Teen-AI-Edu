@@ -1,0 +1,119 @@
+/* ===== 整体页面 ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #1a1230;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 游戏区域：铺满整个窗口 */
+#wrap {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(160deg, #2b1d52 0%, #16213e 100%);
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: none; /* 防止手机上滑动时页面跟着滚 */
+}
+
+/* 顶部信息栏 */
+#hud {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 22px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* 遮罩层通用样式 */
+#overlay, #gameover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  background: rgba(20, 12, 40, 0.78);
+  backdrop-filter: blur(4px);
+  padding: 24px;
+}
+
+#overlay h1, #gameover h1 {
+  font-size: 46px;
+  margin-bottom: 18px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+#overlay p, #gameover p {
+  font-size: 18px;
+  line-height: 1.7;
+  opacity: 0.92;
+  margin-bottom: 22px;
+}
+
+#overlay .hint {
+  font-size: 14px;
+  opacity: 0.6;
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+
+/* 按钮 */
+button {
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #ff6b6b, #ffa94d);
+  border: none;
+  border-radius: 999px;
+  padding: 14px 42px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+  transition: transform 0.12s ease;
+}
+
+button:active { transform: scale(0.95); }
+
+/* 显示 / 隐藏 */
+.hidden { display: none !important; }
+.show { display: flex; }
+
+/* 摄像头画面不直接显示（我们把它画进 canvas 当背景）。
+   用 1px 离屏而不是 display:none，确保视频帧能稳定解码，MediaPipe 才拿得到画面 */
+#cam {
+  position: absolute;
+  width: 1px; height: 1px;
+  top: 0; left: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 开始界面的两个按钮并排 */
+.btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 6px; }
+button.cam { background: linear-gradient(135deg, #4dabf7, #3bc9db); box-shadow: 0 8px 20px rgba(77,171,247,.4); }
+
+/* 顶部"手势模式"小提示 */
+#modeTip {
+  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.45); color: #fff; padding: 8px 18px;
+  border-radius: 999px;

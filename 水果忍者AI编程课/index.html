@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>水果忍者 · AI 编程课（手势版）</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="wrap">
+    <!-- 游戏画布：水果、刀光都画在这里 -->
+    <canvas id="game"></canvas>
+
+    <!-- 摄像头画面：平时不显示，开启后画进游戏当背景 -->
+    <video id="cam" playsinline muted></video>
+
+    <!-- 顶部信息栏：分数和生命 -->
+    <div id="hud">
+      <div id="score">分数：0</div>
+      <div id="lives">❤️❤️❤️</div>
+    </div>
+
+    <!-- 手势模式提示 -->
+    <div id="modeTip" class="hidden">📷 手势模式</div>
+
+    <!-- 开始遮罩层 -->
+    <div id="overlay" class="show">
+      <h1>🍉 水果忍者 🍊</h1>
+      <p>
+        用<b>手势</b>（开摄像头，伸手用食指划）或<b>鼠标</b>来切水果！<br />
+        小心炸弹 💣，也别让水果掉到地上～
+      </p>
+      <div class="btns">
+        <button id="startBtn">🖱️ 鼠标开始</button>
+        <button id="camBtn" class="cam">📷 手势开始（开摄像头）</button>
+      </div>
+      <p class="hint">
+        手势模式需要允许摄像头权限；若在 <b>file://</b> 下打不开，
+        用本地服务器打开：<code>python -m http.server</code> → 访问 <code>http://localhost:8000</code>
+      </p>
+    </div>
+
+    <!-- 结束遮罩层 -->
+    <div id="gameover" class="hidden">
+      <h1>游戏结束</h1>
+      <p id="finalScore">你切到了 0 个水果</p>
+      <button id="restartBtn">🔄 再玩一次</button>
+    </div>
+  </div>
+
+  <!-- 手势识别库（MediaPipe，版本锁死，避免 latest 变动导致加载失败）-->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script>
+
+  <!-- 游戏逻辑都在这个文件里，学生主要改这里 -->
+  <script src="game.js"></script>
+</body>
+</html>

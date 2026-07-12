@@ -1,0 +1,43 @@
+{
+  "skill_version": "1.2",
+  "agent_can_see_image": false,
+  "image": {
+    "provider": "auto",
+    "provider_note": "auto=用Agent内置图像生成；doubao=复用「儿童AI故事视频」skill的config(VOLCENGINE_API_KEY)",
+    "default_style": "绘本插画风格",
+    "style_presets": ["绘本插画", "水彩", "卡通", "像素", "黏土", "剪纸"],
+    "avoid": ["写实人脸特写", "手部特写", "真实公众人物"],
+    "images_per_turn": 1,
+    "best_of_n": 1,
+    "max_retries": 1,
+    "timeout_seconds": 120
+  },
+  "guidance": {
+    "max_iterations": 2,
+    "ask_batch_size": 2,
+    "prompt_char_min": 12,
+    "prompt_char_max": 80,
+    "use_5_elements": ["主体", "场景", "风格", "光线", "情绪"]
+  },
+  "safety": {
+    "refuse_keywords": ["恐怖", "血腥", "暴力", "羞辱", "歧视", "政治敏感", "真人脸", "武器", "色情"],
+    "on_refuse": "温和拒绝并提议换主题，不展开",
+    "text_in_image": "拒绝在图里画文字（AI画不对），文字一律后期加"
+  },
+  "privacy": {
+    "use_nickname": true,
+    "collect_real_name": false,
+    "collect_school": false,
+    "use_project_account": true,
+    "student_bind_personal_account": false
+  },
+  "logging": {
+    "record_for_research": true,
+    "fields": ["nickname", "prompt_versions", "iterations", "errors_found", "errors_type", "final_satisfied", "duration_min"]
+  },
+  "fallback": {
+    "on_api_fail": "重试1次→用预生成保底图做挑错/反推练习",
+    "on_student_stuck": "给灵感图卡(6-8张)做描述+变体",
+    "on_character_drift": "建议图生图+参考图锁角色"
+  }
+}
