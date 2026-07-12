@@ -125,12 +125,12 @@ def main() -> int:
                 voice=resolve_path(args.voice) if args.voice else None,
                 config=config,
             )
-            story_path = project / "text" / "story.json"
+            story_path = project / ".工作" / "故事.json"
             docx_path = project / "故事.docx"
             generate_initial_docx(project, story_path, docx_path)
             print(f"项目已建立且故事文档已初始化：{project}")
         if args.command == "docx":
-            story_path = project / "text" / "story.json"
+            story_path = project / ".工作" / "故事.json"
             docx_path = project / "故事.docx"
             generate_initial_docx(project, story_path, docx_path)
             print(f"故事文档已初始化：{docx_path}")
@@ -141,9 +141,9 @@ def main() -> int:
                 scene=getattr(args, "scene", None),
                 force=getattr(args, "force", False),
             )
-            story_path = project / "text" / "story.json"
+            story_path = project / ".工作" / "故事.json"
             docx_path = project / "故事.docx"
-            images_dir = project / "images"
+            images_dir = project / "图片"
             if story_path.exists():
                 update_docx_with_images(project, story_path, docx_path, images_dir)
                 print(f"故事文档已更新插入图片：{docx_path}")
@@ -169,7 +169,7 @@ def main() -> int:
             if not report["passed"]:
                 return 2
             if config.get("privacy", {}).get("delete_normalized_voice_after_success", True):
-                normalized = project / ".work" / "voice_reference_24k.wav"
+                normalized = project / ".工作" / "声音参考_24k.wav"
                 if normalized.exists():
                     normalized.unlink()
             print("全部检查通过，可以交付。")

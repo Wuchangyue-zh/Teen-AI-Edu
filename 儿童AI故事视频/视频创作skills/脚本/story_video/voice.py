@@ -78,15 +78,17 @@ def generate_voice(
     scene: int | None = None,
     force: bool = False,
 ) -> list[Path]:
+    from .docx_helper import sync_docx_to_json
+    sync_docx_to_json(project)
     paths = ensure_project_dirs(project)
-    story = load_json(paths["text"] / "story.json")
-    source = find_single_input(paths["input"], "voice_reference")
-    normalized = _normalize_voice(source, paths["work"] / "voice_reference_24k.wav")
+    story = load_json(paths["text"] / "故事.json")
+    source = find_single_input(paths["input"], "声音参考")
+    normalized = _normalize_voice(source, paths["work"] / "声音参考_24k.wav")
     selected = {scene} if scene else {1, 2, 3, 4}
     outputs: list[Path] = []
     for scene_data in story["scenes"]:
         index = int(scene_data["index"])
-        output = paths["voice"] / f"scene_{index:02d}.wav"
+        output = paths["voice"] / f"场景_{index:02d}.wav"
         if index not in selected:
             if output.exists():
                 outputs.append(output)

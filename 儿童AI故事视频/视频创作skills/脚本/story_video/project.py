@@ -26,21 +26,21 @@ def initialize_project(
     validate_story(story)
     paths = ensure_project_dirs(project)
 
-    drawing_target = paths["input"] / f"original_drawing{drawing.suffix.lower()}"
+    drawing_target = paths["input"] / f"原始手绘{drawing.suffix.lower()}"
     if drawing.resolve() != drawing_target.resolve():
         shutil.copy2(drawing, drawing_target)
 
     copied_files = [drawing_target]
     if voice is not None:
-        voice_target = paths["input"] / f"voice_reference{voice.suffix.lower()}"
+        voice_target = paths["input"] / f"声音参考{voice.suffix.lower()}"
         if voice.resolve() != voice_target.resolve():
             shutil.copy2(voice, voice_target)
         copied_files.append(voice_target)
 
-    story_target = paths["text"] / "story.json"
+    story_target = paths["text"] / "故事.json"
     save_json(story_target, story)
-    save_json(project / "project.json", {"config": config, "story_file": "text/story.json"})
-    update_manifest(project, "init", copied_files + [story_target, project / "project.json"])
+    save_json(project / ".工作" / "项目配置.json", {"config": config, "story_file": ".工作/故事.json"})
+    update_manifest(project, "init", copied_files + [story_target, project / ".工作" / "项目配置.json"])
     return paths
 
 

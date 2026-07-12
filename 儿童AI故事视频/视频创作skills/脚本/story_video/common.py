@@ -140,13 +140,12 @@ def audio_data_uri(path: Path) -> str:
 def project_paths(project: Path) -> dict[str, Path]:
     return {
         "root": project,
-        "input": project / "input",
-        "text": project / "text",
-        "images": project / "images",
-        "voice": project / "voice",
-        "review": project / "review",
-        "final": project / "final",
-        "work": project / ".work",
+        "input": project / "输入",
+        "text": project / ".工作",
+        "images": project / "图片",
+        "voice": project / "声音",
+        "final": project,
+        "work": project / ".工作",
     }
 
 
@@ -181,7 +180,7 @@ def validate_story(story: dict[str, Any]) -> None:
 
 
 def update_manifest(project: Path, stage: str, files: list[Path]) -> None:
-    manifest_path = project / "run_manifest.json"
+    manifest_path = project / ".工作" / "运行清单.json"
     manifest = load_json(manifest_path) if manifest_path.exists() else {"stages": {}}
     manifest.setdefault("stages", {})[stage] = {
         "status": "completed",

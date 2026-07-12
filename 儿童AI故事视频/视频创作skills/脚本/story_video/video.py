@@ -131,17 +131,19 @@ def render_video(
     force: bool = False,
     bgm: str | None = None,
 ) -> Path:
+    from .docx_helper import sync_docx_to_json
+    sync_docx_to_json(project)
     require_command("ffmpeg")
     paths = ensure_project_dirs(project)
-    story = load_json(paths["text"] / "story.json")
+    story = load_json(paths["text"] / "故事.json")
     video_config = config["video"]
     width = int(video_config["width"])
     height = int(video_config["height"])
     fps = int(video_config.get("fps", 15))
     crf = int(video_config.get("crf", 21))
 
-    image_paths = [paths["images"] / f"scene_{index:02d}.jpg" for index in range(1, 5)]
-    audio_paths = [paths["voice"] / f"scene_{index:02d}.wav" for index in range(1, 5)]
+    image_paths = [paths["images"] / f"场景_{index:02d}.jpg" for index in range(1, 5)]
+    audio_paths = [paths["voice"] / f"场景_{index:02d}.wav" for index in range(1, 5)]
     missing = [path for path in image_paths + audio_paths if not path.exists()]
     if missing:
         raise RuntimeError("合成前素材不完整：" + "、".join(str(path.name) for path in missing))
@@ -156,7 +158,7 @@ def render_video(
         duration = _audio_duration(audio)
         if duration <= 0:
             raise RuntimeError(f"第 {index} 幕音频时长无效。")
-        clip = paths["work"] / f"clip_{index:02d}.mp4"
+        clip = paths["work"] / f"片段_{index:02d}.mp4"
         fade_out_start = max(0.0, duration - 0.35)
         video_filter = (
             f"scale={width}:{height}:force_original_aspect_ratio=increase:in_range=full:out_range=tv,"
@@ -175,12 +177,12 @@ def render_video(
         ])
         clips.append(clip)
 
-    concat_file = paths["work"] / "clips.txt"
+    concat_file = paths["work"] / "片段列表.txt"
     concat_file.write_text(
         "\n".join(f"file '{path.as_posix().replace(chr(39), chr(39) + chr(92) + chr(39) + chr(39))}'" for path in clips) + "\n",
         encoding="utf-8",
     )
-    no_subtitles = paths["work"] / "story_no_subtitles.mp4"
+    no_subtitles = paths["work"] / "故事_无字幕.mp4"
     run_command([
         "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
         "-f", "concat", "-safe", "0", "-i", str(concat_file),
@@ -206,7 +208,7 @@ def render_video(
             fade_duration = 1.5
             fade_start = max(0.0, total_duration - fade_duration)
             
-            mixed_video = paths["work"] / "story_mixed.mp4"
+            mixed_video = paths["work"] / "故事_混音.mp4"
             
             audio_filter = (
                 f"[1:a]volume={bgm_volume},afade=t=out:st={fade_start:.3f}:d={fade_duration:.3f}[bgm];"

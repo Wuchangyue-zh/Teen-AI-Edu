@@ -111,10 +111,12 @@ def generate_images(
     scene: int | None = None,
     force: bool = False,
 ) -> list[Path]:
+    from .docx_helper import sync_docx_to_json
+    sync_docx_to_json(project)
     paths = ensure_project_dirs(project)
-    story = load_json(paths["text"] / "story.json")
-    original = find_single_input(paths["input"], "original_drawing")
-    normalized = _normalize_drawing(original, paths["work"] / "drawing_reference.jpg")
+    story = load_json(paths["text"] / "故事.json")
+    original = find_single_input(paths["input"], "原始手绘")
+    normalized = _normalize_drawing(original, paths["work"] / "手绘参考.jpg")
 
     character = story["character"]
     subject_type = str(character.get("subject_type", "object")).strip().lower()
@@ -126,7 +128,7 @@ def generate_images(
             "不要添加人类头部、身体或操作者，不要把它改造成穿着该物体的人，也不要新增人类主角。"
             "画面中不得出现任何人类、儿童、人形角色、人脸或人手。"
         )
-    character_path = paths["images"] / "character_reference.jpg"
+    character_path = paths["images"] / "角色参考.jpg"
     if force and scene is None and character_path.exists():
         character_path.unlink()
     if not character_path.exists():
@@ -147,7 +149,7 @@ def generate_images(
     outputs: list[Path] = [character_path]
     for scene_data in story["scenes"]:
         index = int(scene_data["index"])
-        output = paths["images"] / f"scene_{index:02d}.jpg"
+        output = paths["images"] / f"场景_{index:02d}.jpg"
         if index not in selected:
             if output.exists():
                 outputs.append(output)
@@ -158,7 +160,7 @@ def generate_images(
             continue
         prompt = (
             "图1是孩子原画，图2是同一角色的标准参考图。请生成同一角色的故事场景，"
-            "严格保留角色的辨识度、主要颜色、结构和手绘气质，不要重新设计角色。"
+            "严格保留角色的辨识度、主要颜色、结构 and 手绘气质，不要重新设计角色。"
             f"{non_human_guard}"
             f"故事场景：{scene_data['visual_prompt']}。"
             f"统一风格：{style}。"
@@ -175,9 +177,5 @@ def generate_images(
         )
         outputs.append(output)
 
-    all_scenes = [paths["images"] / f"scene_{index:02d}.jpg" for index in range(1, 5)]
-    if all(path.exists() for path in all_scenes):
-        contact_sheet = _build_contact_sheet(all_scenes, paths["review"] / "故事板.jpg")
-        outputs.append(contact_sheet)
     update_manifest(project, "images", outputs)
     return outputs

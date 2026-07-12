@@ -9,13 +9,12 @@ from .common import ensure_project_dirs, ffprobe, save_json, update_manifest
 def verify_project(project: Path, *, config: dict[str, Any]) -> dict[str, Any]:
     paths = ensure_project_dirs(project)
     final = paths["final"] / "故事视频.mp4"
-    expected_images = [paths["images"] / f"scene_{index:02d}.jpg" for index in range(1, 5)]
-    expected_audio = [paths["voice"] / f"scene_{index:02d}.wav" for index in range(1, 5)]
+    expected_images = [paths["images"] / f"场景_{index:02d}.jpg" for index in range(1, 5)]
+    expected_audio = [paths["voice"] / f"场景_{index:02d}.wav" for index in range(1, 5)]
     checks: dict[str, bool] = {
-        "角色标准图存在": (paths["images"] / "character_reference.jpg").exists(),
+        "角色标准图存在": (paths["images"] / "角色参考.jpg").exists(),
         "四幕图片齐全": all(path.exists() for path in expected_images),
         "四幕旁白齐全": all(path.exists() for path in expected_audio),
-        "故事板存在": (paths["review"] / "故事板.jpg").exists(),
         "最终视频存在": final.exists(),
     }
     details: dict[str, Any] = {}
@@ -45,7 +44,7 @@ def verify_project(project: Path, *, config: dict[str, Any]) -> dict[str, Any]:
         }
     passed = all(checks.values())
     report = {"passed": passed, "checks": checks, "video": details}
-    report_path = project / "verification.json"
+    report_path = project / ".工作" / "校验结果.json"
     save_json(report_path, report)
     if passed:
         update_manifest(project, "verify", [report_path])
