@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "format": "GIF",
+  "dimensions": [
+    240,
+    240
+  ],
+  "frames": 4,
+  "duration_ms": 960,
+  "bytes": 46922,
+  "max_bytes": 512000,
+  "attempts": [
+    {
+      "size": 240,
+      "colors": 128,
+      "sample_step": 1,
+      "bytes": 46922,
+      "frames": 4
+    }
+  ],
+  "source": "otter-dongle/source/storyboard.png"
+}

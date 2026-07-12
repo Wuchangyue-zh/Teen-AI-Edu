@@ -1,0 +1,8 @@
+Use case: illustration-story
+Asset type: WeChat custom animated sticker storyboard, to be cut into GIF frames
+Primary request: An original cute round little sloth office worker reacts to "Monday coffee keeps me alive until an unexpected meeting" in four clear beats: 1) exhausted sloth slumps at a tiny desk hugging a coffee cup; large Chinese text "续命中" above; 2) after sipping coffee, the same sloth springs up with sparkling eyes and a small full energy bar; large Chinese text "满血！" above; 3) a simple laptop meeting icon appears, the sloth freezes in comic disbelief; large Chinese text "开会？" above; 4) the energy bar is empty and the sloth has collapsed back to the same coffee-hugging pose as panel 1, with a resigned smile; large Chinese text "没电了" above, designed to loop to panel 1.
+Style/medium: original polished 2D Chinese chat-sticker illustration, bold clean dark outlines, high-contrast flat warm colours, expressive face, cheerful comic exaggeration.
+Composition/framing: one perfectly regular 2 by 2 storyboard grid; four equal square panels; same sloth character, scale, viewpoint and desk placement; generous safe padding; thin pale-gray divider lines only.
+Scene/backdrop: perfectly flat pure white #FFFFFF background in every panel; no gradients, floor, cast shadows, reflections, texture, watermark, decorative borders, or panel labels.
+Text (verbatim): "续命中" in panel 1; "满血！" in panel 2; "开会？" in panel 3; "没电了" in panel 4. Render each phrase exactly in large bold black Chinese lettering with a bright yellow outline, in the open upper area of its panel.
+Constraints: every panel is a distinct sequential pose; preserve character identity; text must be crisp and readable at 240 by 240 pixels; no logos and no other characters.

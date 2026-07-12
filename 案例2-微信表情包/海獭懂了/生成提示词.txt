@@ -1,0 +1,8 @@
+Use case: illustration-story
+Asset type: WeChat custom animated sticker storyboard, to be cut into GIF frames
+Primary request: An original, endearing small sea otter chat reaction for "I understand": four sequential poses: 1) listening intently with paws folded, 2) eyes become blank and dazed, 3) a tiny realization spark and a decisive nod, 4) confident satisfied thumbs-up with a big simple smile.
+Style/medium: polished original 2D sticker illustration, bold thick dark outlines, high-contrast warm brown and cream colours, highly expressive face, simple shapes suitable for a 240 by 240 pixel sticker.
+Composition/framing: one perfectly regular 2 by 2 storyboard grid. Four equal square panels with generous safe padding around the character in every panel; identical character scale, viewpoint and position; thin pale-gray divider lines only.
+Scene/backdrop: perfectly flat solid #00ff00 chroma-key background in every panel; no gradients, floor, cast shadow, texture, reflection, watermark, border decoration, or panel labels.
+Text (verbatim): "NONE"
+Constraints: each panel shows one distinct sequential pose; preserve character identity and placement; no other characters, no logos, no text.
