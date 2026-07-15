@@ -28,12 +28,13 @@ function toCanvasPos(clientX, clientY) {
 }
 
 // ---------- 2. 游戏里的"全局变量" ----------
+const STARTING_LIVES = 5;      // 开局生命数（基础挑战可改）
 let fruits = [];
 let particles = [];
 let halves = [];       // 被切开后飞出去的两半水果
 let trail = [];
 let score = 0;
-let lives = 5;
+let lives = STARTING_LIVES;
 let running = false;
 let paused = false;
 let spawnTimer = 0;
@@ -602,7 +603,7 @@ function startGame() {
   popups = [];
   trail = [];
   score = 0;
-  lives = 5;
+  lives = STARTING_LIVES;
   level = 1;
   combo = 0;
   bestCombo = 0;

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#f5f3ff"/>
+  <text x="60" y="82" font-family="Microsoft YaHei, sans-serif" font-size="42" font-weight="700" fill="#4c1d95">看图挑错：左右真是同一个角色吗？</text>
+  <rect x="90" y="130" width="460" height="520" rx="28" fill="#dcfce7" stroke="#7c3aed" stroke-width="10"/>
+  <rect x="650" y="130" width="460" height="520" rx="28" fill="#dbeafe" stroke="#7c3aed" stroke-width="10"/>
+  <g transform="translate(320 390)">
+    <ellipse rx="145" ry="155" fill="#3b82f6"/>
+    <path d="M-90 -125 L-55 -210 L-20 -125" fill="#facc15" stroke="#854d0e" stroke-width="8"/>
+    <circle cx="-50" cy="-20" r="18" fill="white"/><circle cx="50" cy="-20" r="18" fill="white"/>
+    <path d="M-45 60 Q0 95 45 60" fill="none" stroke="white" stroke-width="12"/>
+    <rect x="-80" y="115" width="160" height="34" rx="17" fill="#ef4444"/>
+  </g>
+  <g transform="translate(880 390)">
+    <ellipse rx="145" ry="155" fill="#a855f7"/>
+    <path d="M-105 -120 L-75 -200 L-45 -120 M45 -120 L75 -200 L105 -120" fill="#22c55e" stroke="#166534" stroke-width="8"/>
+    <circle cx="0" cy="-25" r="28" fill="white"/>
+    <path d="M-55 65 Q0 30 55 65" fill="none" stroke="white" stroke-width="12"/>
+    <rect x="-80" y="115" width="160" height="34" rx="17" fill="#facc15"/>
+  </g>
+  <text x="320" y="620" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#374151">蓝色 · 1 只角 · 红围巾 · 2 只眼</text>
+  <text x="880" y="620" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="28" fill="#374151">紫色 · 2 只角 · 黄围巾 · 1 只眼</text>
+  <text x="60" y="750" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#4b5563">教学示意图：颜色、角、眼睛和围巾都变了，角色设定没有保持一致。</text>
+</svg>

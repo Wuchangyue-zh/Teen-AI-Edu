@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#ecfeff"/>
+  <text x="60" y="82" font-family="Microsoft YaHei, sans-serif" font-size="42" font-weight="700" fill="#164e63">看图挑错：海报上的“字”能读吗？</text>
+  <rect x="210" y="130" width="780" height="530" rx="28" fill="#fde68a" stroke="#0891b2" stroke-width="14"/>
+  <circle cx="600" cy="320" r="115" fill="#fb923c"/>
+  <g font-family="serif" font-size="96" font-weight="700" fill="#172554" text-anchor="middle">
+    <text x="420" y="545">夂</text><text x="540" y="545">忄</text><text x="660" y="545">楽</text><text x="780" y="545">ロ</text>
+  </g>
+  <path d="M330 575 L870 575" stroke="#dc2626" stroke-width="12" stroke-dasharray="20 16"/>
+  <text x="60" y="750" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#4b5563">教学示意图：字形像汉字却不能组成正确词语，文字应后期排版。</text>
+</svg>

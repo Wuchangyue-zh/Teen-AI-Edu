@@ -1,12 +1,13 @@
 const pptxgen = require("pptxgenjs");
+const path = require("path");
 
 const pres = new pptxgen();
 pres.layout = "LAYOUT_16x9"; // 10 x 5.625
 pres.author = "Teen-AI-Edu";
 pres.title = "如何使用正确的提示词生图 · 社区体验课";
 
-const IMG = "E:/EduProject/Teen-AI-Edu/如何使用正确的提示词生图/物料包/预生成图库";
-const OUT = "E:/EduProject/Teen-AI-Edu/如何使用正确的提示词生图/物料包/如何使用正确的提示词生图_社区体验课.pptx";
+const IMG = path.join(__dirname, "预生成图库");
+const OUT = path.join(__dirname, "如何使用正确的提示词生图_社区体验课.pptx");
 
 // palette
 const C_DARK = "2A3B47", C_BG = "FBF6EE", C_PRIMARY = "E8654A", C_ACCENT = "2A6F87",
@@ -155,15 +156,20 @@ function notes(s, t) { s.addNotes(t); }
 {
   const s = pres.addSlide();
   titleBar(s, "AI 也会错 · 看图挑错", "AI 在“猜”，会猜错 —— 画完自己看一遍");
-  const imgs = [IMG + "/翻车示例/照片级写实_一个小女孩在弹钢琴的特写_清晰看到双手和手指_2026-07-12T14-37-36.png", IMG + "/翻车示例/一张海报_上面用大字写着夏天快乐四个汉字_2026-07-12T14-37-36.png"];
-  const caps = ["多指 / 多肢（数手指）", "文字乱码（AI 不会写字）"];
-  const xs = [0.7, 5.5];
-  for (let i = 0; i < 2; i++) {
-    s.addImage({ path: imgs[i], x: xs[i], y: 1.6, w: 3.8, h: 2.6, sizing: { type: "cover", w: 3.8, h: 2.6 } });
-    s.addText(caps[i], { x: xs[i], y: 4.25, w: 3.8, h: 0.5, fontSize: 14, fontFace: F, bold: true, color: C_PRIMARY, align: "center", margin: 0 });
+  const imgs = [
+    path.join(IMG, "翻车示例", "教学示意_多指.svg"),
+    path.join(IMG, "翻车示例", "教学示意_违反物理.svg"),
+    path.join(IMG, "翻车示例", "教学示意_文字乱码.svg"),
+    path.join(IMG, "翻车示例", "教学示意_角色漂移.svg"),
+  ];
+  const caps = ["多指 / 多肢", "违反物理", "文字乱码", "角色漂移"];
+  const xs = [0.35, 2.78, 5.21, 7.64];
+  for (let i = 0; i < 4; i++) {
+    s.addImage({ path: imgs[i], x: xs[i], y: 1.6, w: 2.05, h: 2.95, sizing: { type: "contain", w: 2.05, h: 2.95 } });
+    s.addText(caps[i], { x: xs[i], y: 4.62, w: 2.05, h: 0.42, fontSize: 12, fontFace: F, bold: true, color: C_PRIMARY, align: "center", margin: 0 });
   }
-  s.addText("还有：违反物理（水往上流）· 角色漂移（前后不一样）", { x: 0.6, y: 4.85, w: 8.8, h: 0.4, fontSize: 12, fontFace: F, color: C_MUTED, align: "center", margin: 0 });
-  notes(s, "看图挑错话术：AI 在猜会猜错。【注意】这两张是翻车尝试图，模型已较稳，不一定真翻车；课堂真实翻车即时截图更有效。多指/乱码是AI错非提示词错，重生成不计入学生迭代。");
+  s.addText("以上为离线教学示意图，错误点稳定可见；不是模型现场生成结果。", { x: 0.6, y: 5.12, w: 8.8, h: 0.3, fontSize: 10, fontFace: F, color: C_MUTED, align: "center", margin: 0 });
+  notes(s, "看图挑错话术：AI 在猜会猜错。先让学生自己找，再揭晓。以上四张是人为设计的离线教学示意，不冒充模型现场输出。多指/乱码等通常是模型输出错误，重生成不计入学生迭代。");
 }
 
 // ===== P11 AI 小规矩 =====

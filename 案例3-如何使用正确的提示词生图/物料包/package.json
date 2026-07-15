@@ -1,0 +1,10 @@
+{
+  "name": "teen-ai-edu-case3-materials",
+  "private": true,
+  "scripts": {
+    "build:pptx": "node build_pptx.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

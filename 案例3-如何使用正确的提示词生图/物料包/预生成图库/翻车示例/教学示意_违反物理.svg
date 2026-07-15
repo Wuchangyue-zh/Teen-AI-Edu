@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#eff6ff"/>
+  <text x="60" y="82" font-family="Microsoft YaHei, sans-serif" font-size="42" font-weight="700" fill="#1e3a8a">看图挑错：水为什么往上流？</text>
+  <g transform="translate(600 400) rotate(180)">
+    <path d="M-170 -130 L170 -130 L130 130 L-130 130 Z" fill="#dbeafe" stroke="#1d4ed8" stroke-width="14"/>
+    <path d="M-130 -70 L130 -70 L105 85 L-105 85 Z" fill="#38bdf8" opacity="0.75"/>
+  </g>
+  <path d="M600 265 C565 205 555 165 600 105 C645 165 635 205 600 265 Z" fill="#0ea5e9"/>
+  <path d="M520 300 C485 245 482 210 520 160 C560 210 555 250 520 300 Z" fill="#38bdf8"/>
+  <path d="M680 300 C645 245 642 210 680 160 C720 210 715 250 680 300 Z" fill="#38bdf8"/>
+  <path d="M820 570 L970 420" stroke="#dc2626" stroke-width="18" marker-end="url(#arrow)"/>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#dc2626"/></marker></defs>
+  <text x="845" y="620" font-family="Microsoft YaHei, sans-serif" font-size="34" font-weight="700" fill="#dc2626">重力方向？</text>
+  <text x="60" y="750" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#4b5563">教学示意图：倒置杯中的水脱离杯口向上飞，违反日常物理规律。</text>
+</svg>

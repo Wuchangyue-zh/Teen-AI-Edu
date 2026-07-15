@@ -2,7 +2,7 @@
 name: prompt-to-image-guide
 description: 引导小学4-6年级学生用"五要素"写出清楚的提示词并生成图片。当学生要生图、写提示词、或老师带学生做AI生图体验课、社区AI小创客课时使用。会问5个问题搭提示词、当"提示词医生"检查模糊/矛盾、生成图、带学生看图挑错、迭代优化、产出图文小卡。支持引导/快速/检查三种模式。
 agent_created: true
-compatibility: 可在 WorkBuddy / TRAE 等支持 SKILL.md 的 Agent 中使用；生图可用 Agent 内置图像生成工具，或复用「儿童AI故事视频」skill 已配置的豆包 Seedream（VOLCENGINE_API_KEY）。默认在教师机器上运行，学生轮流使用。参数见 config.json，深度规则见 参考/。
+compatibility: 可在 WorkBuddy / TRAE 等支持 SKILL.md 的 Agent 中使用；生图可用 Agent 内置图像生成工具，或读取仓库「案例1-故事视频/视频创作skills」中已配置的豆包 Seedream 设置（密钥仍由环境变量 VOLCENGINE_API_KEY 提供）。默认在教师机器上运行，学生轮流使用。参数见 config.json，深度规则见 参考/。
 ---
 
 # 提示词生图引导 skill
@@ -13,7 +13,7 @@ compatibility: 可在 WorkBuddy / TRAE 等支持 SKILL.md 的 Agent 中使用；
 ## 开始前
 1. 读 `config.json`：确认 `default_style`、`max_iterations`、`safety.refuse_keywords`、`logging.fields` 等参数。
 2. 用昵称 / 编号称呼学生，**不收真实姓名 / 学校 / 班级**（`privacy`）。
-3. 确认生图工具可用（`image.provider`：auto=内置图像生成；doubao=复用同事 skill 的 config）。
+3. 确认生图工具可用（`image.provider`：auto=内置图像生成；doubao=读取仓库 `../../案例1-故事视频/视频创作skills/config.json` 的图像设置，并使用对应脚本）。
 4. 交代三条 **AI 小规矩**：① 不画别人脸、不造假图 ② AI 会出错、别全信 ③ 作品分享前先问家长 / 老师。
 
 ## 三种模式（按场景选）
@@ -91,7 +91,7 @@ Agent 输出素材（提示词 + 感悟 + 图片路径），**拼卡版式由老
 ---
 
 ## 教研日志（按 `logging.fields` 记录）
-每生记录：nickname、prompt_versions、iterations、errors_found、errors_type、final_satisfied、duration_min。供课后复盘用（对接《程序员团队授课指南》复盘表）。
+默认只记录班级匿名汇总（完成率、常见错误、平均迭代次数、流程崩点）。只有在已向监护人单独说明用途与保存期限并取得同意时，才按 `logging.fields` 保存学生级记录：nickname、prompt_versions、iterations、errors_found、errors_type、final_satisfied、duration_min。供课后复盘用（对接《程序员团队授课指南》复盘表）。
 
 ---
 

@@ -3,7 +3,7 @@
   "agent_can_see_image": false,
   "image": {
     "provider": "auto",
-    "provider_note": "auto=用Agent内置图像生成；doubao=复用「儿童AI故事视频」skill的config(VOLCENGINE_API_KEY)",
+    "provider_note": "auto=用Agent内置图像生成；doubao=读取 ../../案例1-故事视频/视频创作skills/config.json，并由对应脚本读取 VOLCENGINE_API_KEY",
     "default_style": "绘本插画风格",
     "style_presets": ["绘本插画", "水彩", "卡通", "像素", "黏土", "剪纸"],
     "avoid": ["写实人脸特写", "手部特写", "真实公众人物"],
@@ -32,7 +32,9 @@
     "student_bind_personal_account": false
   },
   "logging": {
-    "record_for_research": true,
+    "record_for_research": false,
+    "requires_guardian_consent_for_student_level_records": true,
+    "default_retention": "仅保存匿名课堂汇总；未单独取得监护人同意时不保存学生级提示词、录音或照片",
     "fields": ["nickname", "prompt_versions", "iterations", "errors_found", "errors_type", "final_satisfied", "duration_min"]
   },
   "fallback": {

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#fff7ed"/>
+  <text x="60" y="82" font-family="Microsoft YaHei, sans-serif" font-size="42" font-weight="700" fill="#7c2d12">看图挑错：这只手哪里不对？</text>
+  <g fill="#f6c7a5" stroke="#9a5a3a" stroke-width="10" stroke-linejoin="round">
+    <rect x="420" y="410" width="360" height="260" rx="130"/>
+    <rect x="390" y="160" width="75" height="330" rx="38"/>
+    <rect x="475" y="110" width="75" height="360" rx="38"/>
+    <rect x="560" y="90" width="75" height="380" rx="38"/>
+    <rect x="645" y="120" width="75" height="350" rx="38"/>
+    <rect x="730" y="175" width="75" height="310" rx="38"/>
+    <rect x="795" y="300" width="75" height="260" rx="38" transform="rotate(35 795 300)"/>
+  </g>
+  <circle cx="930" cy="250" r="86" fill="#dc2626"/>
+  <text x="930" y="275" text-anchor="middle" font-family="Microsoft YaHei, sans-serif" font-size="66" font-weight="700" fill="white">6?</text>
+  <text x="60" y="750" font-family="Microsoft YaHei, sans-serif" font-size="32" fill="#4b5563">教学示意图：故意画成 6 根手指，错误点稳定可见。</text>
+</svg>
