@@ -10,7 +10,6 @@ html, body {
   user-select: none;
 }
 
-/* 游戏区域：铺满整个窗口 */
 #wrap {
   position: relative;
   width: 100vw;
@@ -23,27 +22,83 @@ html, body {
   width: 100%;
   height: 100%;
   cursor: crosshair;
-  touch-action: none; /* 防止手机上滑动时页面跟着滚 */
+  touch-action: none;
 }
 
 /* 顶部信息栏 */
 #hud {
   position: absolute;
-  top: 16px;
+  top: 14px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: space-between;
-  padding: 0 22px;
-  font-size: 22px;
+  align-items: flex-start;
+  padding: 0 18px;
+  font-size: 20px;
   font-weight: bold;
   color: #fff;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   pointer-events: none;
+  z-index: 4;
 }
 
-/* 遮罩层通用样式 */
-#overlay, #gameover {
+.hud-left, .hud-right {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#level {
+  font-size: 15px;
+  opacity: 0.85;
+  color: #ffd43b;
+}
+
+#highScore {
+  font-size: 14px;
+  opacity: 0.75;
+  text-align: right;
+}
+
+#combo {
+  font-size: 26px;
+  color: #ff922b;
+  text-shadow: 0 0 12px rgba(255, 146, 43, 0.8);
+  transition: transform 0.15s ease;
+  min-height: 32px;
+}
+
+#combo.active {
+  animation: comboPulse 0.35s ease;
+}
+
+@keyframes comboPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* 暂停按钮 */
+.icon-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 6;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 18px;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: none;
+  pointer-events: auto;
+}
+
+.icon-btn:not(.hidden) { display: block; }
+
+/* 遮罩层 */
+#overlay, #gameover, #pauseOverlay {
   position: absolute;
   inset: 0;
   display: flex;
@@ -55,6 +110,12 @@ html, body {
   background: rgba(20, 12, 40, 0.78);
   backdrop-filter: blur(4px);
   padding: 24px;
+  z-index: 10;
+}
+
+#pauseOverlay {
+  background: rgba(10, 8, 20, 0.55);
+  z-index: 8;
 }
 
 #overlay h1, #gameover h1 {
@@ -63,18 +124,48 @@ html, body {
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
-#overlay p, #gameover p {
+#pauseOverlay h2 {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+#overlay p, #gameover p, #pauseOverlay p {
   font-size: 18px;
   line-height: 1.7;
   opacity: 0.92;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
+}
+
+.feature-list {
+  list-style: none;
+  text-align: left;
+  font-size: 15px;
+  line-height: 1.9;
+  opacity: 0.88;
+  margin-bottom: 16px;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
 }
 
 #overlay .hint {
   font-size: 14px;
   opacity: 0.6;
-  margin-top: 18px;
+  margin-top: 12px;
   margin-bottom: 0;
+}
+
+.record {
+  font-size: 16px !important;
+  color: #ffd43b;
+  margin-top: -8px !important;
+}
+
+kbd {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 14px;
 }
 
 /* 按钮 */
@@ -93,12 +184,9 @@ button {
 
 button:active { transform: scale(0.95); }
 
-/* 显示 / 隐藏 */
 .hidden { display: none !important; }
 .show { display: flex; }
 
-/* 摄像头画面不直接显示（我们把它画进 canvas 当背景）。
-   用 1px 离屏而不是 display:none，确保视频帧能稳定解码，MediaPipe 才拿得到画面 */
 #cam {
   position: absolute;
   width: 1px; height: 1px;
@@ -108,17 +196,44 @@ button:active { transform: scale(0.95); }
   z-index: -1;
 }
 
-/* 开始界面的两个按钮并排 */
-.btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 6px; }
-button.cam { background: linear-gradient(135deg, #4dabf7, #3bc9db); box-shadow: 0 8px 20px rgba(77,171,247,.4); }
-
-/* 顶部"手势模式"小提示 */
-#modeTip {
-  position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.45); color: #fff; padding: 8px 18px;
-  border-radius: 999px; font-size: 16px; font-weight: bold;
-  pointer-events: none; z-index: 5;
+.btns {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 6px;
 }
 
-/* 提示里的代码样式 */
-.hint code { background: rgba(255, 255, 255, 0.15); padding: 1px 6px; border-radius: 5px; font-size: 13px; }
+button.cam {
+  background: linear-gradient(135deg, #4dabf7, #3bc9db);
+  box-shadow: 0 8px 20px rgba(77, 171, 247, 0.4);
+}
+
+#modeTip {
+  position: absolute;
+  top: 58px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hint code {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  #hud { font-size: 16px; padding: 0 10px; }
+  #combo { font-size: 20px; }
+  #overlay h1, #gameover h1 { font-size: 34px; }
+  button { font-size: 18px; padding: 12px 28px; }
+}

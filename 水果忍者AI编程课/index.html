@@ -8,52 +8,68 @@
 </head>
 <body>
   <div id="wrap">
-    <!-- 游戏画布：水果、刀光都画在这里 -->
     <canvas id="game"></canvas>
-
-    <!-- 摄像头画面：平时不显示，开启后画进游戏当背景 -->
     <video id="cam" playsinline muted></video>
 
-    <!-- 顶部信息栏：分数和生命 -->
+    <!-- 顶部信息栏 -->
     <div id="hud">
-      <div id="score">分数：0</div>
-      <div id="lives">❤️❤️❤️</div>
+      <div class="hud-left">
+        <div id="score">分数：0</div>
+        <div id="level">等级 1</div>
+      </div>
+      <div id="combo"></div>
+      <div class="hud-right">
+        <div id="highScore">最高：0</div>
+        <div id="lives">❤️❤️❤️❤️❤️</div>
+      </div>
     </div>
 
-    <!-- 手势模式提示 -->
+    <!-- 暂停按钮 -->
+    <button id="pauseBtn" class="icon-btn hidden" title="暂停 (P)">⏸</button>
+
     <div id="modeTip" class="hidden">📷 手势模式</div>
 
-    <!-- 开始遮罩层 -->
+    <!-- 开始遮罩 -->
     <div id="overlay" class="show">
       <h1>🍉 水果忍者 🍊</h1>
       <p>
         用<b>手势</b>（开摄像头，伸手用食指划）或<b>鼠标</b>来切水果！<br />
-        小心炸弹 💣，也别让水果掉到地上～
+        连续切中会触发 <b>Combo 连击</b> 加分；小心炸弹 💣，也别让水果掉到地上～
       </p>
       <div class="btns">
         <button id="startBtn">🖱️ 鼠标开始</button>
         <button id="camBtn" class="cam">📷 手势开始（开摄像头）</button>
       </div>
+      <ul class="feature-list">
+        <li>🔥 连击 Combo：快速连续切到水果，分数更高</li>
+        <li>⬆️ 等级提升：切得越多，水果来得越快</li>
+        <li>🔊 音效反馈：切中、漏掉、炸弹都有声音</li>
+      </ul>
       <p class="hint">
         手势模式需要允许摄像头权限；若在 <b>file://</b> 下打不开，
-        最简单：双击同目录的 <code>play.bat</code>（自动起服务器+开浏览器）；或手动
+        最简单：双击同目录的 <code>play.bat</code>；或手动
         <code>python -m http.server 8123</code> → 访问 <code>http://localhost:8123</code>
       </p>
     </div>
 
-    <!-- 结束遮罩层 -->
+    <!-- 暂停遮罩 -->
+    <div id="pauseOverlay" class="hidden">
+      <h2>⏸ 游戏暂停</h2>
+      <p>按 <kbd>P</kbd> 或 <kbd>Esc</kbd> 继续</p>
+      <button id="resumeBtn">▶ 继续游戏</button>
+    </div>
+
+    <!-- 结束遮罩 -->
     <div id="gameover" class="hidden">
       <h1>游戏结束</h1>
       <p id="finalScore">你切到了 0 个水果</p>
+      <p id="finalRecord" class="record"></p>
       <button id="restartBtn">🔄 再玩一次</button>
     </div>
   </div>
 
-  <!-- 手势识别库（MediaPipe，版本锁死，避免 latest 变动导致加载失败）-->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js"></script>
-
-  <!-- 游戏逻辑都在这个文件里，学生主要改这里 -->
   <script src="game.js"></script>
 </body>
 </html>
