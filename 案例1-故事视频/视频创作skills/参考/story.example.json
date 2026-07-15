@@ -1,6 +1,7 @@
 {
   "title": "小城门的星光钥匙",
-  "creator_display": "小小创作者001",
+  "creator_display": "创作者001",
+  "bgm": "自动匹配",
   "character": {
     "name": "小城门",
     "subject_type": "building",
@@ -8,7 +9,7 @@
     "special_ability": "能听见风藏起来的悄悄话",
     "personality": "认真、好奇、愿意帮助朋友"
   },
-  "style": "温暖童趣的手绘绘本，保留孩子原画的朴拙线条和主要颜色",
+  "style": "温暖手绘绘本，保留原画的朴拙线条和主要颜色",
   "scenes": [
     {
       "index": 1,

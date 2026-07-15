@@ -10,12 +10,12 @@ from .common import ensure_project_dirs, load_json, save_json, update_manifest, 
 def initialize_project(
     project: Path,
     *,
-    drawing: Path,
+    drawing: Path | None,
     story_path: Path,
     voice: Path | None,
     config: dict[str, Any],
 ) -> dict[str, Path]:
-    if not drawing.exists():
+    if drawing is not None and not drawing.exists():
         raise RuntimeError(f"找不到原画：{drawing}")
     if not story_path.exists():
         raise RuntimeError(f"找不到故事文件：{story_path}")
@@ -32,11 +32,12 @@ def initialize_project(
         
     paths = ensure_project_dirs(project)
 
-    drawing_target = paths["input"] / f"原始手绘{drawing.suffix.lower()}"
-    if drawing.resolve() != drawing_target.resolve():
-        shutil.copy2(drawing, drawing_target)
-
-    copied_files = [drawing_target]
+    copied_files: list[Path] = []
+    if drawing is not None:
+        drawing_target = paths["input"] / f"原始手绘{drawing.suffix.lower()}"
+        if drawing.resolve() != drawing_target.resolve():
+            shutil.copy2(drawing, drawing_target)
+        copied_files.append(drawing_target)
     if voice is not None:
         voice_target = paths["input"] / f"声音参考{voice.suffix.lower()}"
         if voice.resolve() != voice_target.resolve():
@@ -55,4 +56,3 @@ def find_single_input(folder: Path, stem: str) -> Path:
     if not candidates:
         raise RuntimeError(f"项目中缺少 {stem} 文件。")
     return candidates[0]
-

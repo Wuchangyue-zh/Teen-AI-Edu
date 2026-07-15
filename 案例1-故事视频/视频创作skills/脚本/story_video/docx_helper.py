@@ -6,6 +6,20 @@ import docx
 from docx.shared import Inches
 from .common import load_json, update_manifest
 
+
+_BGM_OPTIONS = "自动匹配、无、菊次郎的夏天、卡农、空灵之声、勇气之誓"
+
+
+def _add_sound_settings(doc: docx.Document, story: dict[str, Any]) -> None:
+    doc.add_heading("配音设定", level=1)
+    p = doc.add_paragraph()
+    p.add_run(f"★ 配音音色：{story.get('voice', '冰糖')} (仅在无个性化录音时生效，可选官方音色: 冰糖、苏打、茉莉、白桦)\n")
+    doc.add_heading("背景音乐", level=1)
+    p = doc.add_paragraph()
+    selected = story.get("bgm") or "自动匹配"
+    p.add_run(f"★ 背景音乐：{selected}\n")
+    p.add_run(f"可选：{_BGM_OPTIONS}。填写“无”可关闭配乐；留为“自动匹配”会根据故事气氛选择。")
+
 def generate_initial_docx(project_dir: Path, story_path: Path, output_docx_path: Path) -> Path:
     story = load_json(story_path)
     doc = docx.Document()
@@ -39,9 +53,7 @@ def generate_initial_docx(project_dir: Path, story_path: Path, output_docx_path:
         p.add_run(f"★ 性格：{char.get('personality', '无')}\n")
         p.add_run(f"★ 特殊能力：{char.get('special_ability', '无')}\n")
     
-    doc.add_heading("配音设定", level=1)
-    p = doc.add_paragraph()
-    p.add_run(f"★ 配音音色：{story.get('voice', '冰糖')} (仅在无个性化录音时生效，可选官方音色: 冰糖、苏打、茉莉、白桦)\n")
+    _add_sound_settings(doc, story)
     
     doc.add_heading("画面风格", level=1)
     doc.add_paragraph(story.get("style", "无"))
@@ -91,9 +103,7 @@ def update_docx_with_images(project_dir: Path, story_path: Path, output_docx_pat
             doc.add_paragraph("【角色标准参考图】")
             doc.add_picture(str(char_ref), width=Inches(3.5))
         
-    doc.add_heading("配音设定", level=1)
-    p = doc.add_paragraph()
-    p.add_run(f"★ 配音音色：{story.get('voice', '冰糖')} (仅在无个性化录音时生效，可选官方音色: 冰糖、苏打、茉莉、白桦)\n")
+    _add_sound_settings(doc, story)
     
     doc.add_heading("画面风格", level=1)
     doc.add_paragraph(story.get("style", "无"))
@@ -134,6 +144,7 @@ def parse_docx_to_story(docx_path: Path) -> dict[str, Any]:
             "special_ability": ""
         },
         "characters": [],
+        "bgm": "自动匹配",
         "style": "",
         "scenes": []
     }
@@ -219,6 +230,9 @@ def parse_docx_to_story(docx_path: Path) -> dict[str, Any]:
                     val = parts[1].strip()
                     val = re.split(r'[\(\s]', val)[0].strip()
                     story["voice"] = val
+                elif "★ 背景音乐：" in line or "★ 背景音乐:" in line:
+                    parts = line.split("：", 1) if "：" in line else line.split(":", 1)
+                    story["bgm"] = parts[1].strip()
             continue
 
         if current_section == "style":
@@ -314,7 +328,8 @@ def sync_docx_to_json(project: Path) -> None:
     print("正在从 故事.docx 解析并同步最新内容……")
     story = parse_docx_to_story(docx_path)
     
-    from .common import project_paths, save_json
+    from .common import project_paths, save_json, validate_story
+    validate_story(story)
     paths = project_paths(project)
     story_target = paths["text"] / "故事.json"
     save_json(story_target, story)
